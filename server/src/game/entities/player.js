@@ -1,4 +1,5 @@
 import { PLAYER_SPEED } from "../../config/constans.js";
+import { Bomb } from "./bomb.js";
 export class Player {
   constructor(id, name, spawnX, spawnY) {
     this.id = id;
@@ -12,10 +13,39 @@ export class Player {
     this.maxBomb = 1;
     this.speed = PLAYER_SPEED;
     this.flameRange = 1;
-    this.powerups = new Set();
     this.isAlive = true;
     this.lastMoveTime = Date.now();
   }
 
-  respawn() {}
+  respawn() {
+    this.x = this.spawnX;
+    this.y = this.spawnY;
+    this.isAlive = true;
+  }
+
+  death() {
+    this.lives--;
+    this.maxBomb = 1;
+    this.flameRange = 1;
+    this.speed = PLAYER_SPEED;
+    this.isAlive = false;
+  }
+
+  powerUp(type) {
+    switch (type) {
+      case "BOMB":
+        this.maxBomb = Math.min(this.maxBomb++, 3);
+        break;
+      case "FLAME":
+        this.flameRange = Math.min(this.flameRange++, 5);
+        break;
+      case "SPEED":
+        this.speed = Math.min(this.speed + 0.2, 2.0);
+        break;
+    }
+  }
+
+  placeBomb() {
+    return this.bombCount <= this.maxBomb;
+  }
 }
