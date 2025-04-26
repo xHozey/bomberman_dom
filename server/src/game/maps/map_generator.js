@@ -7,6 +7,7 @@
  2: breakable wall 
  3: powerup
 */
+
 export class MapGenerator {
   constructor(levelTemplate, powerupCount) {
     this.template = levelTemplate;
