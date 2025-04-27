@@ -1,7 +1,8 @@
 import { PLAYER_SPEED } from "../../config/constans.js";
+import Bomb from "../entities/bomb.js";
 class Player {
-  constructor(id, name, spawnX, spawnY) {
-    this.id = id;
+  constructor(socket, name, spawnX, spawnY) {
+    this.socket = socket;
     this.name = name;
     this.spawnX = spawnX;
     this.spawnY = spawnY;
@@ -14,6 +15,12 @@ class Player {
     this.flameRange = 1;
     this.isAlive = true;
     this.lastMoveTime = Date.now();
+    this.movement = {
+      right: false,
+      left: false,
+      top: false,
+      bot: false,
+    };
   }
 
   respawn() {
@@ -44,10 +51,41 @@ class Player {
     }
   }
 
-  placeBomb() {
+  setMovement(direction, isMoving) {
+    switch (direction) {
+      case "right":
+        this.movement.right = isMoving;
+        break;
+      case "left":
+        this.movement.left = isMoving;
+        break;
+      case "top":
+        this.movement.top = isMoving;
+        break;
+      case "bot":
+        this.movement.bot = isMoving;
+    }
+  }
+
+  updateMovement() {
+    const now = Date.now();
+    const deltaTime = (now - this.lastMoveTime) / 1000;
+    this.movement.lastUpdate = now;
+
+    if (this.movement.up) this.y -= this.speed * deltaTime;
+    if (this.movement.down) this.y += this.speed * deltaTime;
+    if (this.movement.left) this.x -= this.speed * deltaTime;
+    if (this.movement.right) this.x += this.speed * deltaTime;
+  }
+
+  canPlaceBomb() {
     return this.bombCount <= this.maxBomb;
+  }
+
+  placeBomb() {
+    if (!this.canPlaceBomb) return;
+    const bomb = new Bomb(this.x, this.y, this.flameRange);
   }
 }
 
-
-export default Player
+export default Player;

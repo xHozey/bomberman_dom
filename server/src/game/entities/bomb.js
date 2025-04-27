@@ -3,3 +3,5 @@ export class Bomb {
         
     }
 }
+
+export default Bomb
