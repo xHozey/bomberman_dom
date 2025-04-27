@@ -17,7 +17,7 @@ class GameLoop {
     this.room.players.forEach(player => {
       player.updateMovement()
     });
-    this.room.broadcast()
+    this.room.sync.broadcast()
   }
 
   stop() {

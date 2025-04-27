@@ -4,6 +4,7 @@ import { extractSpawn } from "../utils/helper.js";
 import { UUID } from "../utils/helper.js";
 import GameLoop from "../game/engine/game_loop.js";
 import { logger } from "../utils/logger.js";
+import SyncService from "../network/sync_service.js";
 
 class GameRoom {
   constructor(level) {
@@ -12,6 +13,7 @@ class GameRoom {
     this.map = new MapGenerator(level).generateMap();
     this.playerSpawn = extractSpawn(this.map);
     this.players = [];
+    this.sync = new SyncService(this);
     this.gameloop = new GameLoop(this);
   }
 
@@ -62,7 +64,6 @@ class GameRoom {
       }
     });
   }
-
 }
 
 export default GameRoom;
