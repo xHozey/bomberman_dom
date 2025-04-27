@@ -1,6 +1,5 @@
 import { PLAYER_SPEED } from "../../config/constans.js";
-import { Bomb } from "./bomb.js";
-export class Player {
+class Player {
   constructor(id, name, spawnX, spawnY) {
     this.id = id;
     this.name = name;
@@ -49,3 +48,6 @@ export class Player {
     return this.bombCount <= this.maxBomb;
   }
 }
+
+
+export default Player

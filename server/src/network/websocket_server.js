@@ -1,17 +1,18 @@
-import WebSocket from "ws";
+import { WebSocketServer as WSServer } from "ws";
 import { logger } from "../utils/logger.js";
 import { SOCKET_TYPES, NICKNAME_MAX_LENGTH } from "../config/constans.js";
-export class WebSocketServer {
+import MatchMaker from "./match_maker.js";
+class WebSocketServer {
   constructor(port) {
-    this.server = new WebSocket.Server(port);
+    this.server = new WSServer({ port });
     this.connections = new Map();
     this.pendingConnections = new Map();
+    this.matchmaker = new MatchMaker()
   }
 
-  EventsHandler() {
-    this.server.on("connection", function (socket) {
+  SetupEventsHandler() {
+    this.server.on("connection", (socket) => {
       logger.info(`New connection from ${socket._socket.remoteAddress}`);
-
       this.pendingConnections.set(socket, {
         ip: socket._socket.remoteAddress,
       });
@@ -58,11 +59,15 @@ export class WebSocketServer {
       this.pendingConnections.get(socket) &&
       !this.connections.get(data.nickname) &&
       data.nickname.trim() &&
-      data.nickname < NICKNAME_MAX_LENGTH
+      data.nickname.length < NICKNAME_MAX_LENGTH
     ) {
       this.connections.set(socket, {
         nickname: data.nickname,
       });
+      logger.info(`Welcome ${data.nickname}`);
+      this.pendingConnections.delete(socket);
+      this.matchmaker.addPlayer(socket, data.nickname)
+      return;
     }
     socket.send(
       JSON.stringify({
@@ -76,3 +81,5 @@ export class WebSocketServer {
     logger.info(`${socket._socket.remoteAddress} has disconnected`);
   }
 }
+
+export default WebSocketServer;

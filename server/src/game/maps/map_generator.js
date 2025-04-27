@@ -1,3 +1,5 @@
+import templates from "./templates";
+import { logger } from "../../utils/logger";
 
 /*
  p*: player spawn
@@ -8,31 +10,42 @@
  3: powerup
 */
 
-export class MapGenerator {
-  constructor(levelTemplate, powerupCount) {
-    this.template = levelTemplate;
-    this.powerupCount = powerupCount;
+class MapGenerator {
+  constructor(mapNumber) {
+    try {
+      this.template = templates[`map_${mapNumber}`];
+      if (!this.template) {
+        throw new Error(`Level ${mapNumber} not found.`);
+      }
+    } catch (err) {
+      logger.error(err.message);
+      throw err;
+    }
   }
 
   generateMap() {
-    const map = JSON.parse(JSON.stringify(this.template));
+    const map = JSON.parse(JSON.stringify(this.template.blueprint));
+    const powerupCount = this.template.powers || 0;
+
     const powerupSpots = [];
-    
+
     for (let row = 0; row < map.length; row++) {
       for (let col = 0; col < map[0].length; col++) {
         if (map[row][col] === 0 && Math.random() < 0.4) {
-          map[row][col] = 2; 
+          map[row][col] = 2;
           powerupSpots.push({ row, col });
         }
       }
     }
-    
+
     const shuffledSpots = [...powerupSpots].sort(() => 0.5 - Math.random());
-    for (let i = 0; i < Math.min(this.powerupCount, shuffledSpots.length); i++) {
+    for (let i = 0; i < Math.min(powerupCount, shuffledSpots.length); i++) {
       const { row, col } = shuffledSpots[i];
-      map[row][col] = 3; 
+      map[row][col] = 3;
     }
-    
+
     return map;
   }
 }
+
+export default MapGenerator;
