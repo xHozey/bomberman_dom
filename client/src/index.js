@@ -1,7 +1,6 @@
-import { Main, App } from "./app.js";
+import { Home } from "./app.js";
 import { addRoutes } from "../core/router.js";
 
 addRoutes({
-  "/": Main,
-  "/app": App,
+  "/": Home,
 });
