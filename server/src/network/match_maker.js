@@ -7,24 +7,24 @@ class MatchMaker {
   }
 
   addPlayer(socket, nickname) {
-    let roomId = this.findAvailableRoom();
+    let roomId = this._findAvailableRoom();
 
     if (!roomId) {
-      roomId = this.createNewRoom();
+      roomId = this._createNewRoom();
     }
 
     const room = this.rooms.get(roomId);
     room.addPlayer(socket, nickname);
   }
 
-  createNewRoom() {
+  _createNewRoom() {
     const level = Math.floor(Math.random() * TOTAL_LEVELS);
     const newRoom = new GameRoom(level);
     this.rooms.set(newRoom.roomId, newRoom);
     return newRoom.roomId;
   }
 
-  findAvailableRoom() {
+  _findAvailableRoom() {
     for (const [roomId, room] of this.rooms) {
       if (room.players.length < 4) {
         return roomId;
