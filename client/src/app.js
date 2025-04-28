@@ -1,9 +1,5 @@
-import { H1 } from "../core/components.js";
+import { useState } from "../core/state.js"
 
-export const App = () => {
-  return H1({}, "i am the app");
-};
+export const HomePage = () => {
 
-export const Main = () => {
-  return H1({}, "hello world");
-};
+}
