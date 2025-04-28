@@ -22,15 +22,15 @@ class SyncService {
   _getPlayerStates() {
     return Array.from(this.gameRoom.players.values()).map((p) => ({
       nickname: p.nickname,
-      x: p.position.x,
-      y: p.position.y,
+      x: p.x,
+      y: p.y,
     }));
   }
 
   _getBombStates() {
     return Array.from(this.gameRoom.bombs.values()).map((b) => ({
-      x: b.position.x,
-      y: b.position.y,
+      x: b.x,
+      y: b.y,
       t: b.timer,
     }));
   }
@@ -39,8 +39,8 @@ class SyncService {
     const message = JSON.stringify({ type: "update", data: state });
 
     this.gameRoom.players.forEach((player) => {
-      if (player.ws.readyState === player.ws.OPEN) {
-        player.ws.send(message);
+      if (player.socket.readyState === player.socket.OPEN) {
+        player.socket.send(message);
       }
     });
   }

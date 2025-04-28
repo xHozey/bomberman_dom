@@ -18,8 +18,8 @@ class Player {
     this.movement = {
       right: false,
       left: false,
-      top: false,
-      bot: false,
+      up: false,
+      down: false,
     };
   }
 
@@ -40,10 +40,10 @@ class Player {
   powerUp(type) {
     switch (type) {
       case "BOMB":
-        this.maxBomb = Math.min(this.maxBomb++, 3);
+        this.maxBomb = Math.min(this.maxBomb+1, 3);
         break;
       case "FLAME":
-        this.flameRange = Math.min(this.flameRange++, 5);
+        this.flameRange = Math.min(this.flameRange+1, 5);
         break;
       case "SPEED":
         this.speed = Math.min(this.speed + 0.2, 2.0);
@@ -59,11 +59,11 @@ class Player {
       case "left":
         this.movement.left = isMoving;
         break;
-      case "top":
-        this.movement.top = isMoving;
+      case "up":
+        this.movement.up = isMoving;
         break;
-      case "bot":
-        this.movement.bot = isMoving;
+      case "down":
+        this.movement.down = isMoving;
     }
   }
 
