@@ -46,7 +46,7 @@ class Player {
         this.flameRange = Math.min(this.flameRange+1, 5);
         break;
       case "SPEED":
-        this.speed = Math.min(this.speed + 0.2, 2.0);
+        this.speed = Math.min(this.speed + 0.2, 0.8);
         break;
     }
   }
