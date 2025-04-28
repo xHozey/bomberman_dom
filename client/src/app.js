@@ -1,7 +1,9 @@
-import { Div } from "../core/components.js";
+import { H1 } from "../core/components.js";
 
-export const App = () => {};
+export const App = () => {
+  return H1({}, "i am the app");
+};
 
 export const Main = () => {
-  return Div({}, "hello world");
+  return H1({}, "hello world");
 };

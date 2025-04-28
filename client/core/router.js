@@ -1,4 +1,5 @@
-import { render } from "./chaos.js";
+import { render } from "./dom.js";
+
 const Router = (() => {
   const routes = {};
   let currentPath = null;
@@ -23,7 +24,7 @@ const Router = (() => {
     const component = routes[path] || routes["*"];
 
     if (component) {
-      render(component);
+      render(component)
     } else {
       console.error(`No route found for path: ${path}`);
     }
