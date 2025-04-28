@@ -1,10 +1,11 @@
 import Player from "./entities/player.js";
+import Bomb from "./entities/bomb.js";
 import MapGenerator from "./maps/map_generator.js";
+import GameLoop from "../game/engine/game_loop.js";
+import SyncService from "../network/sync_service.js";
 import { extractSpawn } from "../utils/helper.js";
 import { UUID } from "../utils/helper.js";
-import GameLoop from "../game/engine/game_loop.js";
 import { logger } from "../utils/logger.js";
-import SyncService from "../network/sync_service.js";
 
 class GameRoom {
   constructor(level) {
@@ -23,7 +24,7 @@ class GameRoom {
     const player = new Player(socket, nickname, spawn.x, spawn.y);
     this.players.push(player);
     player.roomId = this.roomId;
-    socket.send({ type: "map", map: this.map });
+    socket.send(JSON.stringify({ type: "map", map: this.map }));
     socket.on("message", (rawData) => {
       try {
         const data = JSON.parse(rawData);
@@ -60,7 +61,7 @@ class GameRoom {
             break;
           case "attack":
             if (!p.canPlaceBomb()) return
-             
+             new Bomb(p.x, p.y, p.flameRang, this.map).dropBomb()
           default:
             break;
         }

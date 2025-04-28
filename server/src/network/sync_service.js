@@ -2,7 +2,7 @@ class SyncService {
   constructor(gameRoom) {
     this.gameRoom = gameRoom;
     this.broadcastInterval = 100;
-    this.lastBroadcast = null;
+    this.lastBroadcast = 0;
   }
 
   broadcast() {
@@ -11,8 +11,8 @@ class SyncService {
 
     const state = {
       t: now,
+      map: this.gameRoom.map,
       players: this._getPlayerStates(),
-      bombs: this._getBombStates(),
     };
 
     this._sendToAll(state);
@@ -27,14 +27,6 @@ class SyncService {
     }));
   }
 
-  _getBombStates() {
-    return Array.from(this.gameRoom.bombs.values()).map((b) => ({
-      x: b.x,
-      y: b.y,
-      t: b.timer,
-    }));
-  }
-
   _sendToAll(state) {
     const message = JSON.stringify({ type: "update", data: state });
 
@@ -45,3 +37,5 @@ class SyncService {
     });
   }
 }
+
+export default SyncService
