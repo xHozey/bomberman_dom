@@ -6,8 +6,10 @@ import { logger } from "../../utils/logger";
  x: permently free cell
  0: free cell
  1: wall 
- 2: breakable wall 
+ 2: soft wall 
  3: powerup
+ 4: bomb
+ 5: explotion
 */
 
 class MapGenerator {

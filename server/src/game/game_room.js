@@ -58,6 +58,9 @@ class GameRoom {
           case "movement":
             p.setMovement(payload.direction, payload.isMoving);
             break;
+          case "attack":
+            if (!p.canPlaceBomb()) return
+             
           default:
             break;
         }

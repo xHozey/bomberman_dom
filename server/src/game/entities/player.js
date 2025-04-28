@@ -81,11 +81,6 @@ class Player {
   canPlaceBomb() {
     return this.bombCount <= this.maxBomb;
   }
-
-  placeBomb() {
-    if (!this.canPlaceBomb) return;
-    const bomb = new Bomb(this.x, this.y, this.flameRange);
-  }
 }
 
 export default Player;
