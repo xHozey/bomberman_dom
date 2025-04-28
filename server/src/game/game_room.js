@@ -20,10 +20,11 @@ class GameRoom {
   }
 
   addPlayer(socket, nickname) {
-    const playerCount = this.players.length + 1;
+    const playerCount = this.players.length;
     const spawn = this.playerSpawn[`p${playerCount}`];
     const player = new Player(socket, nickname, spawn.x, spawn.y);
     this.players.push(player);
+    ///reminder
     player.roomId = this.roomId;
     socket.send(JSON.stringify({ type: "map", map: this.map }));
     socket.on("message", (rawData) => {
