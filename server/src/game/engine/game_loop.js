@@ -14,6 +14,7 @@ class GameLoop {
   }
 
   update() {
+    this.room.update()
     this.room.players.forEach(player => {
       player.updateMovement()
     });

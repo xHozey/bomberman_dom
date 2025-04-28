@@ -6,6 +6,7 @@ import SyncService from "../network/sync_service.js";
 import { extractSpawn } from "../utils/helper.js";
 import { UUID } from "../utils/helper.js";
 import { logger } from "../utils/logger.js";
+import { MAP } from "../config/constans.js";
 
 class GameRoom {
   constructor(level) {
@@ -68,6 +69,21 @@ class GameRoom {
       }
     });
   }
+
+  checkExplosions() {
+    this.players.forEach(player => {
+      const cellX = Math.round(player.x);
+      const cellY = Math.round(player.y);
+      if (this.map[cellX][cellY] === MAP.explosion) {
+        player.death();
+      }
+    });
+  }
+
+  update() {
+    this.checkExplosions()
+  }
+
 }
 
 export default GameRoom;

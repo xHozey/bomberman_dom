@@ -9,7 +9,7 @@ import { logger } from "../../utils/logger";
  2: soft wall 
  3: powerup
  4: bomb
- 5: explotion
+ 5: explosion
 */
 
 class MapGenerator {

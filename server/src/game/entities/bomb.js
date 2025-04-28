@@ -1,4 +1,4 @@
-import { MAP, BOMB_TIMER, EXPLOTION_TIMER } from "../../config/constans.js";
+import { MAP, BOMB_TIMER, explosion_TIMER } from "../../config/constans.js";
 
 export class Bomb {
   constructor(x, y, flameRange, map) {
@@ -8,7 +8,7 @@ export class Bomb {
     this.map = map;
   }
 
-  explotion() {
+  explosion() {
     const affectedTiles = [];
     const directions = [
       [0, 1],
@@ -17,7 +17,7 @@ export class Bomb {
       [-1, 0],
     ];
 
-    this.map[this.x][this.y] = MAP.explotion;
+    this.map[this.x][this.y] = MAP.explosion;
     affectedTiles.push([this.x, this.y]);
 
     for (const [dx, dy] of directions) {
@@ -29,7 +29,7 @@ export class Bomb {
         const tile = this.map[newX][newY];
         if (tile === MAP.wall) break;
         if (tile === MAP.soft_wall) {
-          this.map[newX][newY] = MAP.explotion;
+          this.map[newX][newY] = MAP.explosion;
           affectedTiles.push([newX, newY]);
           break;
         }
@@ -40,13 +40,13 @@ export class Bomb {
       affectedTiles.forEach((tile) => {
         this.map[tile[0]][tile[1]] = 0;
       });
-    }, EXPLOTION_TIMER);
+    }, explosion_TIMER);
   }
 
   dropBomb() {
     this.map[this.x][this.y] = MAP.bomb
     setTimeout(() => {
-        this.explotion()
+        this.explosion()
     }, BOMB_TIMER)
   }
 }

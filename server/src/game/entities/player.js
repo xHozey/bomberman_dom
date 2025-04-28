@@ -1,5 +1,4 @@
-import { PLAYER_SPEED } from "../../config/constans.js";
-import Bomb from "../entities/bomb.js";
+import { PLAYER_SPEED, DEATH_COOLDOWN } from "../../config/constans.js";
 class Player {
   constructor(socket, name, spawnX, spawnY) {
     this.socket = socket;
@@ -35,15 +34,18 @@ class Player {
     this.flameRange = 1;
     this.speed = PLAYER_SPEED;
     this.isAlive = false;
+    setTimeout(() => {
+      this.respawn();
+    }, DEATH_COOLDOWN);
   }
 
   powerUp(type) {
     switch (type) {
       case "BOMB":
-        this.maxBomb = Math.min(this.maxBomb+1, 3);
+        this.maxBomb = Math.min(this.maxBomb + 1, 3);
         break;
       case "FLAME":
-        this.flameRange = Math.min(this.flameRange+1, 5);
+        this.flameRange = Math.min(this.flameRange + 1, 5);
         break;
       case "SPEED":
         this.speed = Math.min(this.speed + 0.2, 0.8);

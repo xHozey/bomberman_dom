@@ -22,6 +22,7 @@ class SyncService {
   _getPlayerStates() {
     return Array.from(this.gameRoom.players.values()).map((p) => ({
       nickname: p.nickname,
+      isAlive: p.isAlive,
       x: p.x,
       y: p.y,
     }));
