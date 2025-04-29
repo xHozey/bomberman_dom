@@ -22,7 +22,6 @@ class GameRoom {
   addPlayer(socket, nickname) {
     const playerCount = this.players.length + 1;
     const spawn = this.playerSpawn[`p${playerCount}`];
-    logger.debug(this.playerSpawn);
 
     const player = new Player(socket, nickname, spawn.x, spawn.y);
     this.players.push(player);

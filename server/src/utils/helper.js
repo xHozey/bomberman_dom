@@ -14,7 +14,6 @@ export const UUID = () => {
 export const extractSpawn = (map) => {
   const result = {};
   const players = new Set(["p1", "p2", "p3", "p4"]);
-
   for (let i = 0; i < map.length; i++) {
     for (let j = 0; j < map[0].length; j++) {
       if (players.has(map[i][j])) {
@@ -22,5 +21,6 @@ export const extractSpawn = (map) => {
       }
     }
   }
+
   return result;
 };

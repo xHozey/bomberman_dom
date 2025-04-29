@@ -1,8 +1,5 @@
-import { promises as fs } from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import { maps } from "./templates.js";
 import { logger } from "../../utils/logger.js";
-
 /*
  p*: player spawn
  x: permently free cell
@@ -11,35 +8,18 @@ import { logger } from "../../utils/logger.js";
  2: soft wall 
  3: powerup
  4: bomb
- 5: explosion
+ 5: explotion
 */
-
-
-// Get current directory path
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 class MapGenerator {
   constructor(mapNumber) {
-    this.mapNumber = mapNumber;
-    this.templatesPath = path.join(__dirname, 'templates');
+    this.template = maps[mapNumber];
   }
 
-  async loadTemplate() {
-    try {
-      const templatePath = path.join(this.templatesPath, `map_${this.mapNumber}.json`);
-      const data = await fs.readFile(templatePath, 'utf-8');
-      this.template = JSON.parse(data);
-    } catch (err) {
-      logger.error(`Failed to load map template: ${err.message}`);
-      throw new Error(`Level ${this.mapNumber} not found.`);
-    }
-  }
-
-  async generateMap() {
-    await this.loadTemplate();
-    
+  generateMap() {
     const map = JSON.parse(JSON.stringify(this.template.blueprint));
     const powerupCount = this.template.powers || 0;
+
     const powerupSpots = [];
 
     for (let row = 0; row < map.length; row++) {

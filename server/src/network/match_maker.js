@@ -1,5 +1,6 @@
 import GameRoom from "../game/game_room.js";
 import { TOTAL_LEVELS } from "../config/constans.js";
+import { logger } from "../utils/logger.js";
 
 class MatchMaker {
   constructor() {
@@ -18,8 +19,9 @@ class MatchMaker {
   }
 
   _createNewRoom() {
-    const level = Math.ceil(Math.random() * TOTAL_LEVELS);
+    const level = Math.floor(Math.random() * TOTAL_LEVELS);
     const newRoom = new GameRoom(level);
+
     this.rooms.set(newRoom.roomId, newRoom);
     return newRoom.roomId;
   }
@@ -42,7 +44,6 @@ class MatchMaker {
       break;
     }
   }
-  
 }
 
 export default MatchMaker;
