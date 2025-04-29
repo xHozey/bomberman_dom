@@ -34,6 +34,8 @@ class WebSocketServer {
   handleMessage(socket, rawData) {
     try {
       const data = JSON.parse(rawData);
+      console.log(data);
+      
       switch (data.type) {
         case SOCKET_TYPES.auth:
           this.handleAuthentification(socket, data);

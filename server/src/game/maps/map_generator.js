@@ -1,4 +1,7 @@
-
+import { promises as fs } from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { logger } from "../../utils/logger.js";
 
 /*
  p*: player spawn
@@ -10,10 +13,7 @@
  4: bomb
  5: explosion
 */
-import { promises as fs } from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import { logger } from "../../utils/logger.js";
+
 
 // Get current directory path
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -42,7 +42,6 @@ class MapGenerator {
     const powerupCount = this.template.powers || 0;
     const powerupSpots = [];
 
-    // Convert some free cells to soft walls (40% chance)
     for (let row = 0; row < map.length; row++) {
       for (let col = 0; col < map[0].length; col++) {
         if (map[row][col] === 0 && Math.random() < 0.4) {
@@ -52,7 +51,6 @@ class MapGenerator {
       }
     }
 
-    // Randomly place powerups
     const shuffledSpots = [...powerupSpots].sort(() => 0.5 - Math.random());
     for (let i = 0; i < Math.min(powerupCount, shuffledSpots.length); i++) {
       const { row, col } = shuffledSpots[i];

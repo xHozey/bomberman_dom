@@ -18,7 +18,7 @@ class MatchMaker {
   }
 
   _createNewRoom() {
-    const level = Math.floor(Math.random() * TOTAL_LEVELS);
+    const level = Math.ceil(Math.random() * TOTAL_LEVELS);
     const newRoom = new GameRoom(level);
     this.rooms.set(newRoom.roomId, newRoom);
     return newRoom.roomId;

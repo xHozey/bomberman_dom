@@ -44,7 +44,7 @@ export function areDepsEqual(newDeps, oldDeps) {
     });
 }
 
-export function Watch(callback, deps = null) {
+export function useEffect(callback, deps = null) {
     const currentComponent = cComp;
 
     if (!afterRenderEffects.has(currentComponent)) {
@@ -53,7 +53,8 @@ export function Watch(callback, deps = null) {
 
     const effects = afterRenderEffects.get(currentComponent);
 
-    if (!deps) {
+    // If no dependencies, run on every render
+    if (deps === null) {
         effects.push(() => {
             const cleanup = cleanupFunctions.get(currentComponent);
             if (typeof cleanup === "function") cleanup();
@@ -66,9 +67,10 @@ export function Watch(callback, deps = null) {
         return;
     }
 
+    // If dependencies are provided
     if (!Array.isArray(deps)) {
         console.error(
-            "%c[Watch Error]%c Expected an array of dependencies.\n" +
+            "%c[useEffect Error]%c Expected an array of dependencies or nothing.\n" +
             "Wrap dependencies in square brackets like this: %c[dep1, dep2]%c.",
             "color: red; font-weight: bold;",
             "color: white;",
@@ -78,11 +80,17 @@ export function Watch(callback, deps = null) {
         return;
     }
 
-    const oldDeps = oldDependencies.get(currentComponent) || [];
+    // Get old dependencies for this component
+    if (!oldDependencies.has(currentComponent)) {
+        oldDependencies.set(currentComponent, []);
+    }
+    const oldDeps = oldDependencies.get(currentComponent);
+    
+    // Check if dependencies have changed
     const hasChanged = !areDepsEqual(deps, oldDeps);
 
     if (hasChanged) {
-        oldDependencies.set(currentComponent, [...deps]);
+        oldDependencies.set(currentComponent, deps);
 
         effects.push(() => {
             const cleanup = cleanupFunctions.get(currentComponent);

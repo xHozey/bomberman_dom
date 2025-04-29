@@ -20,8 +20,10 @@ class GameRoom {
   }
 
   addPlayer(socket, nickname) {
-    const playerCount = this.players.length;
+    const playerCount = this.players.length + 1;
     const spawn = this.playerSpawn[`p${playerCount}`];
+    logger.debug(this.playerSpawn);
+
     const player = new Player(socket, nickname, spawn.x, spawn.y);
     this.players.push(player);
     ///reminder
@@ -62,8 +64,8 @@ class GameRoom {
             p.setMovement(payload.direction, payload.isMoving);
             break;
           case "attack":
-            if (!p.canPlaceBomb()) return
-             new Bomb(p.x, p.y, p.flameRang, this.map).dropBomb()
+            if (!p.canPlaceBomb()) return;
+            new Bomb(p.x, p.y, p.flameRang, this.map).dropBomb();
           default:
             break;
         }
@@ -72,7 +74,7 @@ class GameRoom {
   }
 
   checkExplosions() {
-    this.players.forEach(player => {
+    this.players.forEach((player) => {
       const cellX = Math.round(player.x);
       const cellY = Math.round(player.y);
       if (this.map[cellX][cellY] === MAP.explosion) {
@@ -82,9 +84,8 @@ class GameRoom {
   }
 
   update() {
-    this.checkExplosions()
+    this.checkExplosions();
   }
-
 }
 
 export default GameRoom;
