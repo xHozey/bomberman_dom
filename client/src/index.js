@@ -1,6 +1,4 @@
-import { Home } from "./app.js";
-import { addRoutes } from "../core/router.js";
+import App from "./app.js";
+import { render } from "../core/dom.js";
 
-addRoutes({
-  "/": Home,
-});
+render(App);

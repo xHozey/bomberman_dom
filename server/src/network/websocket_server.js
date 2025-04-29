@@ -1,13 +1,14 @@
 import { WebSocketServer as WSServer } from "ws";
 import { logger } from "../utils/logger.js";
-import { SOCKET_TYPES, NICKNAME_MAX_LENGTH } from "../config/constans.js";
+import { NICKNAME_MAX_LENGTH } from "../config/constans.js";
+import  SOCKET_TYPES  from "../config/protocols.js";
 import MatchMaker from "./match_maker.js";
 class WebSocketServer {
   constructor(port) {
     this.server = new WSServer({ port });
     this.connections = new Map();
     this.pendingConnections = new Map();
-    this.matchmaker = new MatchMaker()
+    this.matchmaker = new MatchMaker();
   }
 
   SetupEventsHandler() {
@@ -16,7 +17,11 @@ class WebSocketServer {
       this.pendingConnections.set(socket, {
         ip: socket._socket.remoteAddress,
       });
-
+      socket.send(
+        JSON.stringify({
+          type: "authentification",
+        })
+      );
       socket.on("message", (rawData) => {
         this.handleMessage(socket, rawData);
       });
@@ -34,10 +39,9 @@ class WebSocketServer {
   handleMessage(socket, rawData) {
     try {
       const data = JSON.parse(rawData);
-      console.log(data);
-      
+
       switch (data.type) {
-        case SOCKET_TYPES.auth:
+        case SOCKET_TYPES.Auth:
           this.handleAuthentification(socket, data);
           break;
         case SOCKET_TYPES:
@@ -49,7 +53,7 @@ class WebSocketServer {
       logger.error(err.message);
       socket.send(
         JSON.stringify({
-          type: SOCKET_TYPES.error,
+          type: SOCKET_TYPES.Error,
           error: "invalid data",
         })
       );
@@ -68,12 +72,12 @@ class WebSocketServer {
       });
       logger.info(`Welcome ${data.nickname}`);
       this.pendingConnections.delete(socket);
-      this.matchmaker.addPlayer(socket, data.nickname)
+      this.matchmaker.addPlayer(socket, data.nickname);
       return;
     }
     socket.send(
       JSON.stringify({
-        type: SOCKET_TYPES.error,
+        type: SOCKET_TYPES.Error,
         error: "invalid username",
       })
     );

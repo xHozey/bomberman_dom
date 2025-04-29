@@ -1,6 +1,7 @@
 import { PLAYER_SPEED, DEATH_COOLDOWN } from "../../config/constans.js";
 class Player {
-  constructor(socket, name, spawnX, spawnY) {
+  constructor(id, socket, name, spawnX, spawnY) {
+    this.id = id;
     this.socket = socket;
     this.name = name;
     this.spawnX = spawnX;

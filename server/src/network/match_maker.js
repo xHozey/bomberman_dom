@@ -1,6 +1,5 @@
 import GameRoom from "../game/game_room.js";
 import { TOTAL_LEVELS } from "../config/constans.js";
-import { logger } from "../utils/logger.js";
 
 class MatchMaker {
   constructor() {

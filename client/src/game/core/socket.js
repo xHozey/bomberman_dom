@@ -1,29 +1,43 @@
 class Socket {
   constructor(url) {
     this.url = url;
-    this.socket;
+    this.socket = null;
+    this.listeners = {};
   }
 
   connect() {
     if (!this.socket) {
       this.socket = new WebSocket(this.url);
       this.socket.onopen = () => {
-        this.message();
+        console.log("Connected to server");
+      };
+
+      this.socket.onmessage = (e) => {
+        try {
+          const data = JSON.parse(e.data);
+          const type = data.type;
+          if (this.listeners[type]) {
+            this.listeners[type].forEach((cb) => cb(data));
+          }
+        } catch (err) {
+          console.error("Invalid JSON:", err);
+        }
       };
     }
     return this.socket;
   }
 
-  send(data) {
-    if (this.socket && this.socket.readyState == WebSocket.OPEN) {
-      this.socket.send(JSON.stringify(data));
+  on(type, callback) {
+    if (!this.listeners[type]) {
+      this.listeners[type] = [];
     }
+    this.listeners[type].push(callback);
   }
 
-  message() {
-    this.socket.onmessage = (e) => {
-      console.log(e.data);
-    };
+  send(data) {
+    if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+      this.socket.send(JSON.stringify(data));
+    }
   }
 }
 
