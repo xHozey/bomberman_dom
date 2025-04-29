@@ -27,7 +27,7 @@ class MatchMaker {
 
   _findAvailableRoom() {
     for (const [roomId, room] of this.rooms) {
-      if (room.players.length < 4) {
+      if (room.state == "pending" && room.players.length < 4) {
         return roomId;
       }
     }
