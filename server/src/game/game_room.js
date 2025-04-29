@@ -112,11 +112,7 @@ class GameRoom {
 
   broadCastRoom(data) {
     this.players.forEach((player) => {
-      player.socket.send(
-        JSON.stringify({
-          data,
-        })
-      );
+      player.socket.send(JSON.stringify(data));
     });
   }
 
