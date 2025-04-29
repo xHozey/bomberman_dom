@@ -25,7 +25,6 @@ class GameRoom {
 
     const player = new Player(socket, nickname, spawn.x, spawn.y);
     this.players.push(player);
-    ///reminder
     player.roomId = this.roomId;
     socket.send(JSON.stringify({ type: "map", map: this.map }));
     socket.on("message", (rawData) => {
