@@ -11,7 +11,7 @@ import SOCKET_TYPES from "../config/protocols.js";
 class GameRoom {
   constructor(level) {
     this.state = "pending";
-    this.startTimer = 20;
+    this.startTimer = 3;
     this.roomId = UUID();
     this.map = new MapGenerator(level).generateMap();
     this.playerSpawn = extractSpawn(this.map);
