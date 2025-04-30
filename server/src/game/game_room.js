@@ -9,6 +9,7 @@ import { logger } from "../utils/logger.js";
 import { MAP, ROOM_STATUS } from "../config/constans.js";
 import SOCKET_TYPES from "../config/protocols.js";
 import ChatService from "../network/chat_service.js";
+
 class GameRoom {
   constructor(level) {
     this.state = ROOM_STATUS.pending;
@@ -44,16 +45,8 @@ class GameRoom {
 
     this.players.push(player);
 
-    socket.on("message", (rawData) => {
-      try {
-        const data = JSON.parse(rawData);
-        if (data.type === SOCKET_TYPES.PlayerAction) {
-          this.handlePlayerAction(socket.id, data.payload);
-        }
-      } catch (err) {
-        logger.error(`Invalid action from ${nickname}: ${err.message}`);
-      }
-    });
+    // No more socket.on("message") here!
+    // The SocketHandler class now handles all messages
 
     this._updateLobbyState();
     this._broadcastLobbyUpdate();

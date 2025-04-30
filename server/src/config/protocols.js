@@ -4,5 +4,6 @@ const SOCKET_TYPES = {
   Lobby: "lobby",
   PlayerAction: "player_action",
   GameStart: "start",
+  Msg: "message",
 };
 export default SOCKET_TYPES;
