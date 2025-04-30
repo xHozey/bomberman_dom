@@ -30,7 +30,6 @@ class SyncService {
 
   _sendToAll(state) {
     const message = JSON.stringify({ type: "update", data: state });
-
     this.gameRoom.players.forEach((player) => {
       if (player.socket.readyState === player.socket.OPEN) {
         player.socket.send(message);

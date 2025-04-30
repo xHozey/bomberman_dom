@@ -1,21 +1,21 @@
 import { WebSocketServer as WSServer } from "ws";
 import { logger } from "../utils/logger.js";
 import { NICKNAME_MAX_LENGTH } from "../config/constans.js";
-import  SOCKET_TYPES  from "../config/protocols.js";
+import SOCKET_TYPES from "../config/protocols.js";
 import MatchMaker from "./match_maker.js";
 class WebSocketServer {
   constructor(port) {
     this.server = new WSServer({ port });
     this.connections = new Map();
-    this.pendingConnections = new Map();
     this.matchmaker = new MatchMaker();
   }
 
   SetupEventsHandler() {
     this.server.on("connection", (socket) => {
       logger.info(`New connection from ${socket._socket.remoteAddress}`);
-      this.pendingConnections.set(socket, {
+      this.connections.set(socket, {
         ip: socket._socket.remoteAddress,
+        status: "pending",
       });
       socket.send(
         JSON.stringify({
@@ -62,16 +62,16 @@ class WebSocketServer {
 
   handleAuthentification(socket, data) {
     if (
-      this.pendingConnections.get(socket) &&
+      this.connections.get(socket).status == "pending" &&
       !this.connections.get(data.nickname) &&
       data.nickname.trim() &&
       data.nickname.length < NICKNAME_MAX_LENGTH
     ) {
       this.connections.set(socket, {
         nickname: data.nickname,
+        status: "connected",
       });
       logger.info(`Welcome ${data.nickname}`);
-      this.pendingConnections.delete(socket);
       this.matchmaker.addPlayer(socket, data.nickname);
       return;
     }

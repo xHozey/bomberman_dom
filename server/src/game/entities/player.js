@@ -14,6 +14,7 @@ class Player {
     this.speed = PLAYER_SPEED;
     this.flameRange = 1;
     this.isAlive = true;
+    this.isDead = false;
     this.lastMoveTime = Date.now();
     this.movement = {
       right: false,
@@ -31,6 +32,10 @@ class Player {
 
   death() {
     this.lives--;
+    if (this.lives === 0) {
+      this.isDead = true;
+      return;
+    }
     this.maxBomb = 1;
     this.flameRange = 1;
     this.speed = PLAYER_SPEED;

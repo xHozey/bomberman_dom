@@ -1,5 +1,5 @@
 import GameRoom from "../game/game_room.js";
-import { TOTAL_LEVELS } from "../config/constans.js";
+import { TOTAL_LEVELS, ROOM_STATUS } from "../config/constans.js";
 
 class MatchMaker {
   constructor() {
@@ -27,7 +27,7 @@ class MatchMaker {
 
   _findAvailableRoom() {
     for (const [roomId, room] of this.rooms) {
-      if (room.state == "pending" && room.players.length < 4) {
+      if (room.state == ROOM_STATUS.pending || room.state == ROOM_STATUS.waiting && room.players.length < 4) {
         return roomId;
       }
     }

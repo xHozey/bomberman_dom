@@ -18,3 +18,10 @@ export const MAP = {
   bomb: 4,
   explosion: 5,
 };
+export const ROOM_STATUS = {
+  pending: "pending",
+  waiting: "waiting",
+  starting: "starting",
+  ingame: "in_game",
+  end: "end",
+};
