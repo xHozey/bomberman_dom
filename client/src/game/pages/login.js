@@ -1,4 +1,5 @@
 import { Div, Input, Button, H1 } from "../../../core/components.js";
+// import "./login.css";
 
 class Login {
   constructor(ws) {
@@ -8,8 +9,9 @@ class Login {
 
   render() {
     return Div({}, [
-      H1({}, "BOMBER MAN"),
+      H1({className: "title"}, "BOMBER MAN"),
       Input({
+        className: "nickname",
         placeholder: "enter your name",
         value: this.nickname,
         onInput: (e) => {
@@ -18,6 +20,7 @@ class Login {
       }),
       Button(
         {
+          className: "play",
           onClick: () => {
             this.ws.send({
               type: "authentification",

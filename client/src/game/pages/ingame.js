@@ -1,4 +1,4 @@
-import { jsx } from "../../../core/dom";
+import { jsx } from "../../../core/dom.js";
 
 class InGame {
   constructor() {}

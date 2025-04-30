@@ -1,0 +1,77 @@
+body {
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: left;
+    margin-left: 4rem;
+    background-color: #ffffff;
+    font-family: 'Press Start 2P', monospace;
+
+    /* bg */
+    background-image: url('https://images.launchbox-app.com//2453c6c0-f96f-4a02-95d7-bd2fa13d3e4b.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  
+  }
+  
+
+
+.title {
+  text-align: center;
+  font-size: 2rem;
+  /* margin-bottom: 2rem; */
+  position: absolute;
+  top: 20%;
+  left: 50px;
+  transform: translateY(-50%);
+
+  border-radius: 12px;
+  border: 2px solid cyan;
+  padding: 20px 30px;
+  color: cyan;
+  text-shadow: 2px 2px black;
+  margin: 0;
+
+}
+
+.nickname {
+    width: 300px;
+    padding: 12px 16px;
+    font-size: 18px;
+    font-family: 'Press Start 2P', monospace;
+    background-color: #222;
+    color: #fff;
+    border: 2px solid #ffcc00;
+    border-radius: 8px;
+    outline: none;
+    letter-spacing: 2px;
+  }
+
+  .play {
+    padding: 12px 16px;
+    font-size: 14px;
+    font-family: 'Press Start 2P', monospace;
+    background-color: #ffcc00;
+    color: #000;
+    border: 2px solid #000;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.1s;
+    margin-left: 1rem;
+  }
+  
+  .play:hover {
+    background-color: #ffaa00;
+  }
+  
+  .play:active {
+    transform: scale(0.98);
+  }
+  
+  .nickname:focus {
+    border-color: #00ffff;
+    box-shadow: 0 0 8px #00ffff;
+  }
+  
