@@ -8,7 +8,7 @@ import { UUID } from "../utils/helper.js";
 import { logger } from "../utils/logger.js";
 import { MAP, ROOM_STATUS } from "../config/constans.js";
 import SOCKET_TYPES from "../config/protocols.js";
-
+import ChatService from "../network/chat_service.js";
 class GameRoom {
   constructor(level) {
     this.state = ROOM_STATUS.pending;
@@ -25,7 +25,9 @@ class GameRoom {
     this.map = new MapGenerator(level).generateMap();
     this.playerSpawn = extractSpawn(this.map);
     this.sync = new SyncService(this);
+    
     this.gameloop = new GameLoop(this);
+    this.chat = new ChatService(this.players);
   }
 
   addPlayer(socket, nickname) {
@@ -41,7 +43,6 @@ class GameRoom {
     );
 
     this.players.push(player);
-    player.roomId = this.roomId;
 
     socket.on("message", (rawData) => {
       try {
@@ -87,22 +88,25 @@ class GameRoom {
   }
 
   _updateLobbyState() {
-    clearTimeout(this.waitingTimer);
-    clearInterval(this.countdownTimer);
-
-    if (this.players.length >= this.minPlayers && this.state === ROOM_STATUS.pending) {
+    if (
+      this.players.length >= this.minPlayers &&
+      this.state === ROOM_STATUS.pending
+    ) {
       this.state = ROOM_STATUS.waiting;
       this.waitingTimer = setTimeout(() => this._startGameCountdown(), 20000);
       this._broadcastLobbyUpdate(true);
-    } else if (this.players.length < this.minPlayers && this.state === ROOM_STATUS.waiting) {
+    } else if (
+      this.players.length < this.minPlayers &&
+      this.state === ROOM_STATUS.waiting
+    ) {
       this.state = ROOM_STATUS.pending;
-      this._broadcastLobbyUpdate(true); 
+      this._broadcastLobbyUpdate(true);
     }
   }
 
   _startGameCountdown() {
     this.state = ROOM_STATUS.starting;
-    this._broadcastLobbyUpdate(true); 
+    this._broadcastLobbyUpdate(true);
 
     this.countdownTimer = setTimeout(() => {
       this._startGame();
@@ -224,7 +228,7 @@ class GameRoom {
       state: this.state,
       roomId: this.roomId,
       level: this.level,
-      isTimerUpdate 
+      isTimerUpdate,
     });
   }
 
