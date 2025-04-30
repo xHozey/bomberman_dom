@@ -245,7 +245,7 @@ class GameRoom {
   update() {
     if (this.state === ROOM_STATUS.ingame) {
       this.checkExplosions();
-      this.sync.update();
+      // this.sync.update();
     }
   }
 }
