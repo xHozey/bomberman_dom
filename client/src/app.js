@@ -19,5 +19,5 @@ ws.on(SOCKET_TYPES.Lobby, () => {
 
 ws.on(SOCKET_TYPES.GameStart, (data) => {
   root.innerHTML = "";
-  root.append;
+  root.append();
 });

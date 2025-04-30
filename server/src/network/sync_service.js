@@ -23,6 +23,7 @@ class SyncService {
     return Array.from(this.gameRoom.players.values()).map((p) => ({
       nickname: p.nickname,
       isAlive: p.isAlive,
+      isDead: p.isDead,
       x: p.x,
       y: p.y,
     }));
@@ -38,4 +39,4 @@ class SyncService {
   }
 }
 
-export default SyncService
+export default SyncService;
