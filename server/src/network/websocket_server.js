@@ -2,6 +2,7 @@ import { WebSocketServer as WSServer } from "ws";
 import { logger } from "../utils/logger.js";
 import MatchMaker from "./match_maker.js";
 import SocketHandler from "./socket_handler.js";
+import { UUID } from "../utils/helper.js";
 
 class WebSocketServer {
   constructor(port) {
@@ -12,7 +13,7 @@ class WebSocketServer {
 
   SetupEventsHandler() {
     this.server.on("connection", (socket) => {
-      socket.id = crypto.randomUUID?.();
+      socket.id = UUID();
       this.socketHandler.handleConnection(socket, this.matchmaker);
     });
 
