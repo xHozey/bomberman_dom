@@ -24,7 +24,7 @@ export default class Player {
     this.movementStartTime = null;
     this.timePlaceBomb = 3000;
     this.lastTimePlaceBomb = 0;
-    this.rewards = {
+    this.powerups = {
       bombing: false,
       speed: false,
       fire: false,
@@ -37,16 +37,15 @@ export default class Player {
   }
 
   loseLife() {
-    if (!this.isAlive()) return;
+    if (this.isDead) return;
     this.lives -= 1;
-  }
-
-  isAlive() {
-    return this.lives > 0;
+    if (this.lives == 0) {
+      this.isDead = true;
+    }
   }
 
   updateMove(data, room) {
-    if (!this.isAlive()) return;
+    if (this.isDead) return;
     const deltaTime = data.deltaTime || 0.016;
     const moveSpeed = this.speed * deltaTime;
     const prevX = this.x;
@@ -109,7 +108,7 @@ export default class Player {
       this.x = prevX;
       this.y = prevY;
     } else {
-      this._checkRewardCollection(room);
+      this._checkpowerupCollection(room);
       this._updateBombOverlap(room);
     }
 
@@ -297,13 +296,13 @@ export default class Player {
 
   placeBomb(room) {
     if (
-      !this.rewards.bombing &&
+      !this.powerups.bombing &&
       Date.now() - this.lastTimePlaceBomb < this.timePlaceBomb
     ) {
       return;
     }
     this.lastTimePlaceBomb = Date.now();
-    if (!this.isAlive()) return;
+    if (this.isDead) return;
 
     this.bombsPlaced = 1;
     const row = Math.floor((this.y + 20) / GAME_CONFIG.TILE_SIZE);
@@ -317,7 +316,7 @@ export default class Player {
       { dr: 1, dc: 0 }, // Down
       { dr: 0, dc: -1 }, // Left
     ];
-    if (this.rewards.fire) {
+    if (this.powerups.fire) {
       directions.push(
         { dr: -2, dc: 0 }, // Up 2 tiles
         { dr: 0, dc: 2 }, // Right 2 tiles
@@ -402,7 +401,7 @@ export default class Player {
             frames,
           });
           if (gift) {
-            room.addReward(newRow, newCol, index);
+            room.addpowerup(newRow, newCol, index);
           }
         } else if (
           room.map[newRow][newCol] === 0 ||
@@ -428,7 +427,7 @@ export default class Player {
       this.loseLife();
       this.conn.send(
         safeStringify({
-          type: SOCKET_TYPES.PLAYER_LIVES ,
+          type: SOCKET_TYPES.PLAYER_LIVES,
           Id: this.id,
           hearts: this.lives,
         })
@@ -441,8 +440,7 @@ export default class Player {
       });
 
       this.checkPlayerWin(room, Array.from(room.players));
-      if (!this.isAlive()) {
-        this.isDead = true;
+      if (this.isDead) {
         room.broadcast({
           type: SOCKET_TYPES.PLAYER_DEATH,
           Id: this.id,
@@ -465,46 +463,46 @@ export default class Player {
     }
   }
 
-  _checkRewardCollection(room) {
+  _checkpowerupCollection(room) {
     const playerCenterX = this.x + this.width / 2;
     const playerCenterY = this.y + this.height / 2;
     const playerTileX = Math.floor(playerCenterX / GAME_CONFIG.TILE_SIZE);
     const playerTileY = Math.floor(playerCenterY / GAME_CONFIG.TILE_SIZE);
 
-    const rewardKey = `${playerTileY}_${playerTileX}`;
-    if (room.rewards && room.rewards[rewardKey]) {
-      const rewardType = room.rewards[rewardKey];
-      this.collectReward(rewardType);
+    const powerupKey = `${playerTileY}_${playerTileX}`;
+    if (room.powerups && room.powerups[powerupKey]) {
+      const powerupType = room.powerups[powerupKey];
+      this.collectpowerup(powerupType);
 
       room.broadcast({
         type: SOCKET_TYPES.COLLECT_POWERUP,
         position: { row: playerTileY, col: playerTileX },
         playerId: this.id,
-        rewardType,
+        powerupType,
       });
 
-      room.removeReward(playerTileY, playerTileX);
+      room.removepowerup(playerTileY, playerTileX);
     }
   }
 
-  collectReward(rewardType) {
-    const rewardDurations = {
+  collectpowerup(powerupType) {
+    const powerupDurations = {
       bomb: 10000,
       speed: 10000,
       fire: 10000,
     };
 
-    const resetReward = (type) => {
+    const resetpowerup = (type) => {
       switch (type) {
         case "bomb":
-          this.rewards.bombing = false;
+          this.powerups.bombing = false;
           break;
         case "speed":
-          this.rewards.speed = false;
+          this.powerups.speed = false;
           this.speed = 25;
           break;
         case "fire":
-          this.rewards.fire = false;
+          this.powerups.fire = false;
           break;
         default:
           logger.warn(`Unknown powerup type: ${type}`);
@@ -512,34 +510,34 @@ export default class Player {
       this.sendPlayerStatsUpdate();
     };
 
-    switch (rewardType) {
+    switch (powerupType) {
       case "bomb":
-        this.rewards.bombing = true;
+        this.powerups.bombing = true;
         clearTimeout(this.bombTimeout);
         this.bombTimeout = setTimeout(
-          () => resetReward("bomb"),
-          rewardDurations.bomb
+          () => resetpowerup("bomb"),
+          powerupDurations.bomb
         );
         break;
       case "speed":
-        this.rewards.speed = true;
+        this.powerups.speed = true;
         this.speed = 50;
         clearTimeout(this.speedTimeout);
         this.speedTimeout = setTimeout(
-          () => resetReward("speed"),
-          rewardDurations.speed
+          () => resetpowerup("speed"),
+          powerupDurations.speed
         );
         break;
       case "fire":
-        this.rewards.fire = true;
+        this.powerups.fire = true;
         clearTimeout(this.fireTimeout);
         this.fireTimeout = setTimeout(
-          () => resetReward("fire"),
-          rewardDurations.fire
+          () => resetpowerup("fire"),
+          powerupDurations.fire
         );
         break;
       default:
-        logger.warn(`Unknown powerup type: ${rewardType}`);
+        logger.warn(`Unknown powerup type: ${powerupType}`);
         return;
     }
 
@@ -550,9 +548,9 @@ export default class Player {
     this.conn.send(
       safeStringify({
         type: SOCKET_TYPES.PLAYER_STATS,
-        bombPower: this.rewards.bombing,
-        speed: this.rewards.speed,
-        fire: this.rewards.fire,
+        bombPower: this.powerups.bombing,
+        speed: this.powerups.speed,
+        fire: this.powerups.fire,
       })
     );
   }

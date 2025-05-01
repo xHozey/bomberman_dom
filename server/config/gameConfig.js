@@ -19,10 +19,10 @@ export const GAME_CONFIG = {
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
   ],
   PLAYER_POSITIONS: [
-    [1, 1], // Player 1
-    [14, 13], // Player 2
-    [1, 15], // Player 3
-    [12, 1], // Player 4
+    [1, 1],
+    [14, 13],
+    [1, 15],
+    [12, 1],
   ],
   TILE_SIZE: 40,
   MAX_PLAYERS: 4,

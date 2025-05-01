@@ -104,8 +104,8 @@ function handleServerMessages(data) {
     case "hearts":
       hearts(data);
       break;
-    case "rewardCollected":
-      rewardCollected(data);
+    case "powerupCollected":
+      powerupCollected(data);
       break;
     case "playerStatsUpdate":
       updatePlayerStats(data);
@@ -205,7 +205,7 @@ function updatePlayerStats(data) {
   updateRender(statsNode, status);
 }
 
-function rewardCollected(data) {
+function powerupCollected(data) {
   const canvas = Ref.gameCanvasRef.current;
   const tileElement = Selectbyrowcol(
     canvas,

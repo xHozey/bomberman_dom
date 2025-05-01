@@ -6,7 +6,7 @@ export default class Room {
     this.id = id;
     this.players = new Map();
     this.started = false;
-    this.rewards = {};
+    this.powerups = {};
     this.countInterval = null;
     this.countP = null;
     this.map = null;
@@ -51,18 +51,18 @@ export default class Room {
     this.tileSize = tileSize;
   }
 
-  addReward(row, col, index) {
+  addpowerup(row, col, index) {
     const powerUpTypes = ["bomb", "speed", "fire"];
-    const rewardType = powerUpTypes[index];
-    this.rewards[`${row}_${col}`] = rewardType;
+    const powerupType = powerUpTypes[index];
+    this.powerups[`${row}_${col}`] = powerupType;
     this.broadcast({
       type: SOCKET_TYPES.ADD_POWERUP,
       position: { row, col },
-      rewardType,
+      powerupType,
     });
   }
 
-  removeReward(row, col) {
-    delete this.rewards[`${row}_${col}`];
+  removepowerup(row, col) {
+    delete this.powerups[`${row}_${col}`];
   }
 }

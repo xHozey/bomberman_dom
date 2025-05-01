@@ -6,7 +6,7 @@ export const SOCKET_TYPES = {
   PLAYER_CHAT: "chatMsg",
   PLAYER_UPDATE: "updatePlayers",
   GAME_START: "startGame",
-  ADD_POWERUP: "rewardAdded",
+  ADD_POWERUP: "powerupAdded",
   PLAYER_REMOVE: "removePlayer",
   WINNER: "theWinnerIs",
   PUT_BOMB: "drawBomb",
@@ -16,6 +16,6 @@ export const SOCKET_TYPES = {
   PLAYER_LIVES: "hearts",
   PLAYER_DATA: "brodcastplayerinfo",
   PLAYER_DEATH: "playerDead",
-  REWARD_COLLECTED: "rewardCollected",
+  powerup_COLLECTED: "powerupCollected",
   PLAYER_STATS: "playerStatsUpdate",
 };
