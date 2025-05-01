@@ -4,6 +4,22 @@ export default class GameMap {
   constructor() {
     this.map = JSON.parse(JSON.stringify(GAME_CONFIG.MAP));
     this.tileSize = GAME_CONFIG.TILE_SIZE;
+    this.randomizeBricks();
+  }
+
+  randomizeBricks() {
+    for (let i = 0; i < this.map.length; i++) {
+      for (let j = 0; j < this.map[i].length; j++) {
+        if (this.map[i][j] == 0) {
+          if (Math.random() < 0.8) {
+            this.map[i][j] = 3;
+          }
+        }
+        if (this.map[i][j] == 9) {
+          this.map[i][j] = 0;
+        }
+      }
+    }
   }
 
   initializePlayers(players) {

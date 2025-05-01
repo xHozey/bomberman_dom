@@ -428,7 +428,7 @@ export default class Player {
       this.loseLife();
       this.conn.send(
         safeStringify({
-          type: "hearts",
+          type: SOCKET_TYPES.PLAYER_LIVES ,
           Id: this.id,
           hearts: this.lives,
         })
@@ -436,7 +436,7 @@ export default class Player {
 
       const playersArray = Array.from(room.players.values());
       room.broadcast({
-        type: "brodcastplayerinfo",
+        type: SOCKET_TYPES.PLAYER_DATA,
         players: playersArray,
       });
 
@@ -444,7 +444,7 @@ export default class Player {
       if (!this.isAlive()) {
         this.isDead = true;
         room.broadcast({
-          type: "playerDead",
+          type: SOCKET_TYPES.PLAYER_DEATH,
           Id: this.id,
         });
       }
@@ -457,7 +457,7 @@ export default class Player {
     if (alivePlayers.length === 1) {
       room.started = false;
       room.broadcast({
-        type: "theWinnerIs",
+        type: SOCKET_TYPES.WINNER,
         name: alivePlayers[0][1].nickname,
       });
     } else if (alivePlayers.length === 0) {
@@ -477,7 +477,7 @@ export default class Player {
       this.collectReward(rewardType);
 
       room.broadcast({
-        type: "rewardCollected",
+        type: SOCKET_TYPES.COLLECT_POWERUP,
         position: { row: playerTileY, col: playerTileX },
         playerId: this.id,
         rewardType,
@@ -549,7 +549,7 @@ export default class Player {
   sendPlayerStatsUpdate() {
     this.conn.send(
       safeStringify({
-        type: "playerStatsUpdate",
+        type: SOCKET_TYPES.PLAYER_STATS,
         bombPower: this.rewards.bombing,
         speed: this.rewards.speed,
         fire: this.rewards.fire,

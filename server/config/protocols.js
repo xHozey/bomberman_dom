@@ -12,5 +12,10 @@ export const SOCKET_TYPES = {
   PUT_BOMB: "drawBomb",
   REMOVE_BOMB: "removeBomb",
   EXPLOSION: "drawExplosion",
-  WALL_DESTROY: "destroyWall"
+  WALL_DESTROY: "destroyWall",
+  PLAYER_LIVES: "hearts",
+  PLAYER_DATA: "brodcastplayerinfo",
+  PLAYER_DEATH: "playerDead",
+  REWARD_COLLECTED: "rewardCollected",
+  PLAYER_STATS: "playerStatsUpdate",
 };
