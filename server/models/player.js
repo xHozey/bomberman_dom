@@ -1,5 +1,5 @@
-import { safeStringify } from '../utils/helpers.js';
-import { GAME_CONFIG } from '../config/gameConfig.js';
+import { safeStringify } from "../utils/helpers.js";
+import { GAME_CONFIG } from "../config/gameConfig.js";
 
 export default class Player {
   constructor(nickname, id, conn) {
@@ -18,7 +18,7 @@ export default class Player {
     this.fire = 1;
     this.isMoving = false;
     this.isDead = false;
-    this.direction = 'up';
+    this.direction = "up";
     this.movementStartTime = null;
     this.timePlaceBomb = 3000;
     this.lastTimePlaceBomb = 0;
@@ -45,30 +45,30 @@ export default class Player {
 
   updateMove(data, room) {
     if (!this.isAlive()) return;
-    const deltaTime = data.deltaTime || 0.016; // Default to ~60fps
+    const deltaTime = data.deltaTime || 0.016;
     const moveSpeed = this.speed * deltaTime;
     const prevX = this.x;
     const prevY = this.y;
 
     switch (data.direction) {
-      case 'up':
+      case "up":
         this.y -= moveSpeed;
-        this.direction = 'up';
+        this.direction = "up";
         this.isMoving = true;
         break;
-      case 'down':
+      case "down":
         this.y += moveSpeed;
-        this.direction = 'down';
+        this.direction = "down";
         this.isMoving = true;
         break;
-      case 'left':
+      case "left":
         this.x -= moveSpeed;
-        this.direction = 'left';
+        this.direction = "left";
         this.isMoving = true;
         break;
-      case 'right':
+      case "right":
         this.x += moveSpeed;
-        this.direction = 'right';
+        this.direction = "right";
         this.isMoving = true;
         break;
       default:
@@ -116,12 +116,13 @@ export default class Player {
       if (!this.movementStartTime) this.movementStartTime = Date.now();
       const elapsed = Date.now() - this.movementStartTime;
       const frameDuration = 200;
-      const frameIndex = Math.floor(elapsed / frameDuration) % currentSprite.length;
+      const frameIndex =
+        Math.floor(elapsed / frameDuration) % currentSprite.length;
       this.positionX = currentSprite[frameIndex].x;
       this.positionY = currentSprite[frameIndex].y;
 
       const moveData = {
-        type: 'playerMove',
+        type: "playerMove",
         position: {
           x: this.x,
           y: this.y,
@@ -158,7 +159,8 @@ export default class Player {
       for (let x = playerTileX - 1; x <= playerTileX + 1; x++) {
         if (y >= 0 && y < room.map.length && x >= 0 && x < room.map[0].length) {
           const tileType = room.map[y][x];
-          const tileTypes = x + 1 < room.map[0].length ? room.map[y][x + 1] : null;
+          const tileTypes =
+            x + 1 < room.map[0].length ? room.map[y][x + 1] : null;
 
           if (
             tileType === 1 ||
@@ -177,8 +179,9 @@ export default class Player {
               playerTop < tileBottom - 16 &&
               playerBottom > tileTop
             ) {
-              if (this.direction === 'down') {
-                const rightEdgeCollision = Math.abs(playerRight - tileLeft + 5) <= 19.75;
+              if (this.direction === "down") {
+                const rightEdgeCollision =
+                  Math.abs(playerRight - tileLeft + 5) <= 19.75;
                 const right = Math.abs(playerRight - tileLeft) > 38;
 
                 if (tileType === 0 || tileTypes === 0) {
@@ -196,7 +199,7 @@ export default class Player {
                 return true;
               }
 
-              if (this.direction === 'up') {
+              if (this.direction === "up") {
                 const rightEdgeCollision =
                   Math.abs(playerRight - tileLeft + 5) >= 48 ||
                   Math.abs(playerRight - tileLeft) <= 13;
@@ -217,9 +220,10 @@ export default class Player {
                 return true;
               }
 
-              if (this.direction === 'left') {
+              if (this.direction === "left") {
                 if (tileType === 0 || tileTypes === 0) {
-                  const bottomEdgeCollision = Math.abs(playerBottom - tileTop) < 15 && tileTop > 0;
+                  const bottomEdgeCollision =
+                    Math.abs(playerBottom - tileTop) < 15 && tileTop > 0;
                   if (bottomEdgeCollision) {
                     this.userPx = Math.min(this.userPx + 1, 6);
                     this.y -= this.userPx;
@@ -229,9 +233,10 @@ export default class Player {
                 return true;
               }
 
-              if (this.direction === 'right') {
+              if (this.direction === "right") {
                 if (tileType === 0 || tileTypes === 0) {
-                  const rightEdgeCollision = Math.abs(playerBottom - tileTop) < 15;
+                  const rightEdgeCollision =
+                    Math.abs(playerBottom - tileTop) < 15;
                   if (rightEdgeCollision && playerBottom > tileTop) {
                     this.userPx = Math.min(this.userPx + 1, 6);
                     this.y -= this.userPx;
@@ -258,7 +263,7 @@ export default class Player {
 
     const toRemove = [];
     for (const bombKey of this.overlappingBombs) {
-      const [bombRow, bombCol] = bombKey.split('_').map(Number);
+      const [bombRow, bombCol] = bombKey.split("_").map(Number);
       const bombTileLeft = bombCol * GAME_CONFIG.TILE_SIZE;
       const bombTileTop = bombRow * GAME_CONFIG.TILE_SIZE;
       const bombTileRight = bombTileLeft + GAME_CONFIG.TILE_SIZE;
@@ -289,7 +294,10 @@ export default class Player {
   }
 
   placeBomb(room) {
-    if (!this.rewards.bombing && Date.now() - this.lastTimePlaceBomb < this.timePlaceBomb) {
+    if (
+      !this.rewards.bombing &&
+      Date.now() - this.lastTimePlaceBomb < this.timePlaceBomb
+    ) {
       return;
     }
     this.lastTimePlaceBomb = Date.now();
@@ -340,7 +348,7 @@ export default class Player {
   #drawBomb(row, col, room) {
     room.map[row][col] = 4;
     room.broadcast({
-      type: 'drawBomb',
+      type: "drawBomb",
       position: { row, col },
     });
   }
@@ -348,19 +356,19 @@ export default class Player {
   #removeBomb(row, col, room) {
     room.map[row][col] = 0;
     room.broadcast({
-      type: 'removeBomb',
+      type: "removeBomb",
       position: { row, col },
     });
   }
 
   #destroyWall(row, col, gift, index, directions, frames, room) {
     room.broadcast({
-      type: 'drawExplosion',
+      type: "drawExplosion",
       position: { row, col },
       frames,
     });
     room.broadcast({
-      type: 'HitByExplosion',
+      type: "HitByExplosion",
       row,
       col,
     });
@@ -370,7 +378,7 @@ export default class Player {
       const newCol = col + dc;
 
       room.broadcast({
-        type: 'HitByExplosion',
+        type: "HitByExplosion",
         row: newRow,
         col: newCol,
       });
@@ -384,7 +392,7 @@ export default class Player {
         if (room.map[newRow][newCol] === 3) {
           room.map[newRow][newCol] = 0;
           room.broadcast({
-            type: 'destroyWall',
+            type: "destroyWall",
             position: { row: newRow, col: newCol },
             gift,
             index,
@@ -398,7 +406,7 @@ export default class Player {
           room.map[newRow][newCol] >= 5
         ) {
           room.broadcast({
-            type: 'drawExplosion',
+            type: "drawExplosion",
             position: { row: newRow, col: newCol },
             frames,
           });
@@ -415,15 +423,17 @@ export default class Player {
 
     if (data.row === playerTileRow && data.col === playerTileCol) {
       this.loseLife();
-      this.conn.send(safeStringify({
-        type: 'hearts',
-        Id: this.id,
-        hearts: this.lives,
-      }));
+      this.conn.send(
+        safeStringify({
+          type: "hearts",
+          Id: this.id,
+          hearts: this.lives,
+        })
+      );
 
       const playersArray = Array.from(room.players.values());
       room.broadcast({
-        type: 'brodcastplayerinfo',
+        type: "brodcastplayerinfo",
         players: playersArray,
       });
 
@@ -431,7 +441,7 @@ export default class Player {
       if (!this.isAlive()) {
         this.isDead = true;
         room.broadcast({
-          type: 'playerDead',
+          type: "playerDead",
           Id: this.id,
         });
       }
@@ -444,11 +454,11 @@ export default class Player {
     if (alivePlayers.length === 1) {
       room.started = false;
       room.broadcast({
-        type: 'theWinnerIs',
+        type: "theWinnerIs",
         name: alivePlayers[0][1].nickname,
       });
     } else if (alivePlayers.length === 0) {
-      console.log('No players alive. It\'s a draw!');
+      console.log("No players alive. It's a draw!");
     }
   }
 
@@ -464,7 +474,7 @@ export default class Player {
       this.collectReward(rewardType);
 
       room.broadcast({
-        type: 'rewardCollected',
+        type: "rewardCollected",
         position: { row: playerTileY, col: playerTileX },
         playerId: this.id,
         rewardType,
@@ -483,14 +493,14 @@ export default class Player {
 
     const resetReward = (type) => {
       switch (type) {
-        case 'bomb':
+        case "bomb":
           this.rewards.bombing = false;
           break;
-        case 'speed':
+        case "speed":
           this.rewards.speed = false;
           this.speed = 25;
           break;
-        case 'fire':
+        case "fire":
           this.rewards.fire = false;
           break;
         default:
@@ -500,21 +510,30 @@ export default class Player {
     };
 
     switch (rewardType) {
-      case 'bomb':
+      case "bomb":
         this.rewards.bombing = true;
         clearTimeout(this.bombTimeout);
-        this.bombTimeout = setTimeout(() => resetReward('bomb'), rewardDurations.bomb);
+        this.bombTimeout = setTimeout(
+          () => resetReward("bomb"),
+          rewardDurations.bomb
+        );
         break;
-      case 'speed':
+      case "speed":
         this.rewards.speed = true;
         this.speed = 50;
         clearTimeout(this.speedTimeout);
-        this.speedTimeout = setTimeout(() => resetReward('speed'), rewardDurations.speed);
+        this.speedTimeout = setTimeout(
+          () => resetReward("speed"),
+          rewardDurations.speed
+        );
         break;
-      case 'fire':
+      case "fire":
         this.rewards.fire = true;
         clearTimeout(this.fireTimeout);
-        this.fireTimeout = setTimeout(() => resetReward('fire'), rewardDurations.fire);
+        this.fireTimeout = setTimeout(
+          () => resetReward("fire"),
+          rewardDurations.fire
+        );
         break;
       default:
         console.warn(`Unknown reward type: ${rewardType}`);
@@ -525,11 +544,13 @@ export default class Player {
   }
 
   sendPlayerStatsUpdate() {
-    this.conn.send(safeStringify({
-      type: 'playerStatsUpdate',
-      bombPower: this.rewards.bombing,
-      speed: this.rewards.speed,
-      fire: this.rewards.fire,
-    }));
+    this.conn.send(
+      safeStringify({
+        type: "playerStatsUpdate",
+        bombPower: this.rewards.bombing,
+        speed: this.rewards.speed,
+        fire: this.rewards.fire,
+      })
+    );
   }
 }
