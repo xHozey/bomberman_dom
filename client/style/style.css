@@ -20,6 +20,7 @@ body {
     padding: 0;
     box-sizing: border-box;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    /* font-family: 'Press Start 2P', cursive; */
 }
 
 /* Login styles with enhanced visuals */
@@ -196,32 +197,41 @@ body::before {
 }
 
 .game-title {
-    font-size: 28px;
-    font-weight: bold;
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
+    font-family: 'Press Start 2P', cursive;
     text-transform: uppercase;
-    letter-spacing: 3px;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-    position: relative;
-    display: inline-block;
-
+    letter-spacing: 2px;
+    background-image: linear-gradient(to right, #1442d0, #c695ff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-align: center;
+    /* position: relative; */
+    padding: 0.4rem 0;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .game-title::after {
     content: '';
     position: absolute;
-    bottom: -5px;
-    left: 25%;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
     width: 50%;
     height: 3px;
-    background: white;
+    background: linear-gradient(to right, #1442d0, #c695ff);
     border-radius: 3px;
-    box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+    box-shadow: 0 0 10px rgba(144, 210, 255, 0.5);
 }
 
 .content-container {
     display: flex;
     flex-grow: 1;
-    height: calc(100vh - 60px); /* Subtract header height */
+    height: calc(100vh - 60px);
+    /* Subtract header height */
+    align-items: stretch; /* Make all children stretch to same height */
+    background: rgba(22, 40, 57, 0.4); /* Add a consistent background */
 }
 
 /* .game-area {
@@ -240,20 +250,18 @@ body::before {
     justify-content: center;
     align-items: center;
     padding: 20px;
-
     background: rgba(44, 83, 100, 0.3);
-    /* translucent dark background */
     box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-    backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    border-radius: 15px;
-    margin: 0 20px;
+    backdrop-filter: blur(10px);
     position: relative;
+    margin: 0;
+    height: 100%; /* Ensure full height */
 }
 
 
 
-.game-area::after {
+/* .game-area::after {
     content: "";
     position: absolute;
     top: 0;
@@ -263,7 +271,7 @@ body::before {
     background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%233a7bd5' fill-opacity='0.05' fill-rule='evenodd'%3E%3Ccircle cx='3' cy='3' r='3'/%3E%3Ccircle cx='13' cy='13' r='3'/%3E%3C/g%3E%3C/svg%3E");
     pointer-events: none;
     z-index: 0;
-}
+} */
 
 .game-canvas {
     width: 100%;
@@ -290,15 +298,15 @@ body::before {
 
 .chat-sidebar {
     width: 300px;
-    background: rgba(22, 40, 57, 0.3);
+    background: rgba(22, 40, 57, 0.4);
     padding: 15px;
     display: flex;
     flex-direction: column;
-    border-left: 1px solid #3a7bd5;
-    box-shadow: -5px 0 15px rgba(0, 0, 0, 0.3);
-    backdrop-filter: blur(10px);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+    /* backdrop-filter: blur(10px); */
     -webkit-backdrop-filter: blur(10px);
-    border-radius: 0 10px 10px 0;
+    height: 100%; /* Ensure full height */
+    margin: 0; /* Remove margins */
 }
 
 
@@ -312,7 +320,7 @@ body::before {
     max-height: calc(100vh - 150px);
     padding-right: 5px;
     scrollbar-width: thin;
-    scrollbar-color: #ff4b1f #243447;
+    scrollbar-color: #5f409e #243447;
 }
 
 .message-container::-webkit-scrollbar {
@@ -332,7 +340,7 @@ body::before {
 .message {
     padding: 12px;
     border-radius: 10px;
-    background-color: rgba(36, 52, 71, 0.8);
+    /* background-color: rgba(36, 52, 71, 0.8); */
     border: 1px solid #3a7bd5;
     margin-bottom: 10px;
     box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
@@ -398,18 +406,18 @@ body::before {
 .send-button {
     padding: 10px 15px;
     border-radius: 20px;
-    background: linear-gradient(to right, #ff4b1f, #ff9068);
+    background: linear-gradient(to right, #5d419e, #423676);
     color: white;
     border: none;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 3px 10px rgba(255, 75, 31, 0.3);
+    box-shadow: 0 3px 10px rgb(66 53 119);
     min-width: 70px;
     font-weight: bold;
 }
 
 .send-button:hover {
-    background: linear-gradient(to right, #ff5e3a, #ff9d77);
+    background: linear-gradient(to right, #7567f1, #ff9d77);
     transform: translateY(-2px);
     box-shadow: 0 5px 15px rgba(255, 75, 31, 0.5);
 }
@@ -480,6 +488,7 @@ body::before {
     0% {
         left: -100%;
     }
+
     100% {
         left: 200%;
     }
@@ -489,8 +498,10 @@ body::before {
     position: fixed;
     top: 0;
     left: 0;
-    width: 250px; /* Width of the sidebar */
-    height: 100vh; /* Full vertical height */
+    width: 250px;
+    /* Width of the sidebar */
+    height: 100vh;
+    /* Full vertical height */
     background: rgba(22, 40, 57, 0.4);
     color: white;
     padding: 20px;
@@ -503,27 +514,27 @@ body::before {
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     z-index: 10;
-  }
-  
-  .footer-content {
+}
+
+.footer-content {
     display: flex;
     flex-direction: column;
     gap: 20px;
     width: 100%;
-  }
-  
-  .footer-section {
+}
+
+.footer-section {
     margin-bottom: 20px;
     width: 100%;
-  }
-  
-  /* Optional: Style hearts */
-  .heart-icon {
+}
+
+/* Optional: Style hearts */
+.heart-icon {
     width: 20px;
     height: 20px;
     margin-right: 5px;
-  }
-  
+}
+
 
 .lives-section img.heart-icon {
     width: 20px;
@@ -533,6 +544,10 @@ body::before {
     filter: drop-shadow(0 0 5px rgba(255, 0, 0, 0.7));
     animation: heartbeat 2s infinite;
 }
+
+/* .lives {
+font-family: 'Courier New', Courier, monospace;
+} */
 
 .connected-players {
     list-style: none;
@@ -610,12 +625,13 @@ body::before {
 }
 
 .game-container {
-    max-width: 700px;
+    margin: 0 auto;
     height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
     transform-origin: center center;
+    transform: scale(0.85); /* Scale down the container while preserving proportions */
     filter: drop-shadow(0 0 20px rgba(58, 123, 213, 0.3));
 }
 
@@ -648,7 +664,7 @@ body::before {
     }
 }
 
-.popup {
+/* .popup {
     position: fixed;
     top: 50%;
     left: 50%;
@@ -665,7 +681,7 @@ body::before {
     text-align: center;
     border: 1px solid #3a7bd5;
     z-index: 1000;
-}
+} */
 
 .modal-overlay {
     position: fixed;
@@ -707,7 +723,7 @@ body::before {
 }
 
 /* For the popup overall */
-.popup {
+/* .popup {
     background-color: #333;
     border: 5px solid #ff4b1f;
     border-radius: 12px;
@@ -717,7 +733,7 @@ body::before {
     box-shadow: 0 0 20px rgba(255, 204, 0, 0.6);
     z-index: 99999;
     width: max-content;
-}
+} */
 
 .popup h2 {
     color: #ff9068;
@@ -754,7 +770,7 @@ body::before {
     flex-direction: column;
     box-shadow: 5px 0 15px rgba(0, 0, 0, 0.3);
     border-right: 1px solid rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
+    /* backdrop-filter: blur(10px); */
     -webkit-backdrop-filter: blur(10px);
     z-index: 10;
 }
@@ -767,7 +783,7 @@ body::before {
 }
 
 .sidebar-section {
-    background: rgba(0, 0, 0, 0.2);
+    /* background: rgba(0, 0, 0, 0.2); */
     padding: 15px;
     border-radius: 8px;
     border: 1px solid rgba(255, 255, 255, 0.1);
