@@ -1,8 +1,9 @@
 import { safeStringify } from "../utils/helpers.js";
 import { GAME_CONFIG } from "../config/gameConfig.js";
-
+import { logger } from "../utils/logger.js";
 export default class Player {
-  constructor(nickname, id, conn) {
+  constructor(nickname, id, conn, room) {
+    this.room = room;
     this.x = 0;
     this.y = 0;
     this.nickname = nickname;
@@ -336,16 +337,16 @@ export default class Player {
     ];
 
     this.overlappingBombs.add(`${row}_${col}`);
-    this.#drawBomb(row, col, room);
+    this._drawBomb(row, col, room);
 
     setTimeout(() => {
-      this.#removeBomb(row, col, room);
-      this.#destroyWall(row, col, gift, index, directions, frames, room);
+      this._removeBomb(row, col, room);
+      this._destroyWall(row, col, gift, index, directions, frames, room);
       this.overlappingBombs.delete(`${row}_${col}`);
     }, 3000);
   }
 
-  #drawBomb(row, col, room) {
+  _drawBomb(row, col, room) {
     room.map[row][col] = 4;
     room.broadcast({
       type: "drawBomb",
@@ -353,7 +354,7 @@ export default class Player {
     });
   }
 
-  #removeBomb(row, col, room) {
+  _removeBomb(row, col, room) {
     room.map[row][col] = 0;
     room.broadcast({
       type: "removeBomb",
@@ -361,7 +362,7 @@ export default class Player {
     });
   }
 
-  #destroyWall(row, col, gift, index, directions, frames, room) {
+  _destroyWall(row, col, gift, index, directions, frames, room) {
     room.broadcast({
       type: "drawExplosion",
       position: { row, col },
@@ -458,7 +459,7 @@ export default class Player {
         name: alivePlayers[0][1].nickname,
       });
     } else if (alivePlayers.length === 0) {
-      console.log("No players alive. It's a draw!");
+      logger.info(`room: ${this.room} Draw!`);
     }
   }
 
@@ -504,7 +505,7 @@ export default class Player {
           this.rewards.fire = false;
           break;
         default:
-          console.warn(`Unknown reward type: ${type}`);
+          logger.warn(`Unknown powerup type: ${type}`);
       }
       this.sendPlayerStatsUpdate();
     };
@@ -536,7 +537,7 @@ export default class Player {
         );
         break;
       default:
-        console.warn(`Unknown reward type: ${rewardType}`);
+        logger.warn(`Unknown powerup type: ${rewardType}`);
         return;
     }
 

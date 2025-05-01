@@ -1,5 +1,7 @@
 import GameMap from '../models/gameMap.js';
 import { safeStringify } from '../utils/helpers.js';
+import { SOCKET_TYPES } from '../config/protocols.js';
+import { logger } from '../utils/logger.js';
 
 export default class GameService {
   constructor(roomService) {
@@ -8,12 +10,12 @@ export default class GameService {
 
   startGame(room) {
     if (room.started) {
-      console.log(`Room ${room.id} already started`);
+      logger.info(`Room ${room.id} already started`);
       return;
     }
 
     room.started = true;
-    console.log(`Starting game in room ${room.id}`);
+    logger.info(`Starting game in room ${room.id}`);
 
     const gameMap = new GameMap();
     const playersArray = Array.from(room.players.values());
@@ -23,7 +25,7 @@ export default class GameService {
 
     for (const player of playersArray) {
       player.conn.send(safeStringify({
-        type: 'startGame',
+        type: SOCKET_TYPES.GAME_START,
         nickname: player.nickname,
         lives: player.lives,
         players: playersArray,

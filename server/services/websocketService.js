@@ -1,5 +1,7 @@
 import { WebSocketServer } from "ws";
 import Player from "../models/player.js";
+import { SOCKET_TYPES } from "../config/protocols.js";
+import { logger } from "../utils/logger.js";
 
 export default class WebSocketService {
   constructor(server, roomService, gameService) {
@@ -23,40 +25,40 @@ export default class WebSocketService {
         }
 
         switch (data.type) {
-          case "newPlayer":
+          case SOCKET_TYPES.PLAYER_JOIN:
             const id = Date.now() + Math.floor(Math.random() * 1000);
             currentPlayer = new Player(data.nickname, id, ws);
             currentRoom = this.roomService.findAvailableRoom();
             currentRoom.addPlayer(currentPlayer);
 
             currentRoom.broadcast({
-              type: "updatePlayers",
+              type: SOCKET_TYPES.PLAYER_UPDATE,
               playerCount: currentRoom.players.size,
             });
 
-            console.log(
+            logger.info(
               `Player ${data.nickname} joined Room ${currentRoom.id}`
             );
             this.roomService.scheduleGameStart(currentRoom, this.gameService);
             break;
 
-          case "playerMove":
+          case SOCKET_TYPES.PLAYER_MOVE:
             if (currentPlayer) currentPlayer.updateMove(data, currentRoom);
             break;
 
-          case "placeBomb":
+          case SOCKET_TYPES.PLAYER_PLACE_BOMB:
             if (currentPlayer) currentPlayer.placeBomb(currentRoom);
             break;
 
-          case "HitByExplosion":
+          case SOCKET_TYPES.PLAYER_HIT_BY_EXPLOSION:
             if (currentPlayer)
               currentPlayer.isPlayerHitByExplosion(data, currentRoom);
             break;
 
-          case "chatMsg":
+          case SOCKET_TYPES.PLAYER_CHAT:
             if (currentRoom) {
               currentRoom.broadcast({
-                type: "chatMsg",
+                type: SOCKET_TYPES.PLAYER_CHAT,
                 nickname: currentPlayer.nickname,
                 messageText: data.messageText || "",
               });
@@ -64,7 +66,7 @@ export default class WebSocketService {
             break;
 
           default:
-            console.log("Unknown message type:", data.type);
+            logger.warn("Unknown message type:", data.type);
             break;
         }
       });
@@ -73,7 +75,7 @@ export default class WebSocketService {
         if (currentRoom && currentPlayer) {
           currentRoom.removePlayer(currentPlayer.id);
           currentRoom.broadcast({
-            type: "updatePlayers",
+            type: SOCKET_TYPES.PLAYER_UPDATE,
             playerCount: currentRoom.players.size,
           });
         }

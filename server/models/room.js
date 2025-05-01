@@ -1,4 +1,5 @@
-import { safeStringify } from '../utils/helpers.js';
+import { safeStringify } from "../utils/helpers.js";
+import { SOCKET_TYPES } from "../config/protocols.js";
 
 export default class Room {
   constructor(id) {
@@ -21,13 +22,13 @@ export default class Room {
     if (this.started) {
       const playersArray = Array.from(this.players.values());
       this.broadcast({
-        type: 'removePlayer',
+        type: "removePlayer",
         id: playerId,
         players: playersArray,
       });
       if (this.players.size === 1) {
         this.broadcast({
-          type: 'theWinnerIs',
+          type: "theWinnerIs",
           name: this.players.values().next().value.nickname,
         });
         this.started = false;
@@ -39,7 +40,7 @@ export default class Room {
 
   broadcast(data) {
     for (const player of this.players.values()) {
-      if (player.conn.readyState === 1) { // WebSocket.OPEN
+      if (player.conn.readyState === WebSocket.OPEN) {
         player.conn.send(safeStringify(data));
       }
     }
@@ -51,11 +52,11 @@ export default class Room {
   }
 
   addReward(row, col, index) {
-    const powerUpTypes = ['bomb', 'speed', 'fire'];
+    const powerUpTypes = ["bomb", "speed", "fire"];
     const rewardType = powerUpTypes[index];
     this.rewards[`${row}_${col}`] = rewardType;
     this.broadcast({
-      type: 'rewardAdded',
+      type: SOCKET_TYPES.ADD_POWERUP,
       position: { row, col },
       rewardType,
     });

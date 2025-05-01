@@ -1,11 +1,13 @@
-import Room from '../models/room.js';
-import { GAME_CONFIG } from '../config/gameConfig.js';
+import Room from "../models/room.js";
+import { GAME_CONFIG } from "../config/gameConfig.js";
+import { UUID } from "../utils/helpers.js";
+import { SOCKET_TYPES } from "../config/protocols.js";
 
 export default class RoomService {
   constructor() {
     this.rooms = new Map();
     this.roomTimeouts = new Map();
-    this.nextRoomId = 1;
+    
   }
 
   findAvailableRoom() {
@@ -14,7 +16,7 @@ export default class RoomService {
         return room;
       }
     }
-    const room = new Room(this.nextRoomId++);
+    const room = new Room(UUID());
     this.rooms.set(room.id, room);
     return room;
   }
@@ -30,15 +32,15 @@ export default class RoomService {
 
         // Start countdown
         if (!room.countInterval) {
-          room.countP = 0;
+          room.countP = GAME_CONFIG.UPDATE_INTERVAL;
           room.countInterval = setInterval(() => {
-            room.countP++;
+            room.countP--;
             room.broadcast({
-              type: 'updatePlayers',
+              type: SOCKET_TYPES.PLAYER_UPDATE,
               playerCount: room.players.size,
               countP: room.countP,
             });
-            if (room.countP >= 20) {
+            if (room.countP <= 0) {
               clearInterval(room.countInterval);
               room.countInterval = null;
             }

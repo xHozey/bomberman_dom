@@ -27,5 +27,5 @@ export const GAME_CONFIG = {
     TILE_SIZE: 40,
     MAX_PLAYERS: 4,
     START_TIMEOUT: 200,
-    UPDATE_INTERVAL: 100,
+    WAITING_COUNT: 100,
   };
