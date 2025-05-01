@@ -4,8 +4,7 @@ import { SOCKET_TYPES } from '../config/protocols.js';
 import { logger } from '../utils/logger.js';
 
 export default class GameService {
-  constructor(roomService) {
-    this.roomService = roomService;
+  constructor() {
   }
 
   startGame(room) {
@@ -15,7 +14,7 @@ export default class GameService {
     }
 
     room.started = true;
-    logger.info(`Starting game in room ${room.id}`);
+    logger.info(`Game started at room ${room.id}`);
 
     const gameMap = new GameMap();
     const playersArray = Array.from(room.players.values());

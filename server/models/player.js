@@ -1,6 +1,7 @@
 import { safeStringify } from "../utils/helpers.js";
 import { GAME_CONFIG } from "../config/gameConfig.js";
 import { logger } from "../utils/logger.js";
+import { SOCKET_TYPES } from "../config/protocols.js";
 export default class Player {
   constructor(nickname, id, conn, room) {
     this.room = room;
@@ -123,7 +124,7 @@ export default class Player {
       this.positionY = currentSprite[frameIndex].y;
 
       const moveData = {
-        type: "playerMove",
+        type: SOCKET_TYPES.PLAYER_MOVE,
         position: {
           x: this.x,
           y: this.y,

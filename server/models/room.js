@@ -22,13 +22,13 @@ export default class Room {
     if (this.started) {
       const playersArray = Array.from(this.players.values());
       this.broadcast({
-        type: "removePlayer",
+        type: SOCKET_TYPES.PLAYER_REMOVE,
         id: playerId,
         players: playersArray,
       });
       if (this.players.size === 1) {
         this.broadcast({
-          type: "theWinnerIs",
+          type: SOCKET_TYPES.WINNER,
           name: this.players.values().next().value.nickname,
         });
         this.started = false;
@@ -40,7 +40,7 @@ export default class Room {
 
   broadcast(data) {
     for (const player of this.players.values()) {
-      if (player.conn.readyState === WebSocket.OPEN) {
+      if (player.conn.readyState) {
         player.conn.send(safeStringify(data));
       }
     }
