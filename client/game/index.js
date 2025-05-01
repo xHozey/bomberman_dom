@@ -24,7 +24,7 @@ export function waiting(element) {
       "div",
       { className: "waiting-animation" },
       jsx("img", {
-        src: "/images/bomberman3d.gif",
+        src: "/images/source.gif",
         alt: "Waiting...",
         style: "margin-top: 10px;",
       }),
@@ -294,11 +294,11 @@ function updatePlayerCount(count, playerId,countP) {
         "div",
         { className: "waiting-animation" },
         jsx("img", {
-          src: "/images/bomberman3d.gif",
+          src: "/images/source.gif",
           alt: "Waiting...",
           style: "margin-top: 10px;",
         }),
-        jsx("p", {}, progressText)
+        jsx("p", { class: "countP"}, progressText)
       )
     );
 
@@ -320,7 +320,7 @@ function startGame(data, tileMap) {
         "div",
         { className: "waiting-animation" },
         jsx("img", {
-          src: "/images/bomberman3d.gif",
+          src: "/images/source.gif",
           alt: "Waiting...",
           style: "margin-top: 10px;",
         }),
