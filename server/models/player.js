@@ -350,7 +350,7 @@ export default class Player {
   _drawBomb(row, col, room) {
     room.map[row][col] = 4;
     room.broadcast({
-      type: "drawBomb",
+      type: SOCKET_TYPES.PUT_BOMB,
       position: { row, col },
     });
   }
@@ -358,19 +358,20 @@ export default class Player {
   _removeBomb(row, col, room) {
     room.map[row][col] = 0;
     room.broadcast({
-      type: "removeBomb",
+      type: SOCKET_TYPES.REMOVE_BOMB,
       position: { row, col },
     });
   }
 
   _destroyWall(row, col, gift, index, directions, frames, room) {
     room.broadcast({
-      type: "drawExplosion",
+      type: SOCKET_TYPES.EXPLOSION,
       position: { row, col },
       frames,
     });
+
     room.broadcast({
-      type: "HitByExplosion",
+      type: SOCKET_TYPES.PLAYER_HIT_BY_EXPLOSION,
       row,
       col,
     });
@@ -380,7 +381,7 @@ export default class Player {
       const newCol = col + dc;
 
       room.broadcast({
-        type: "HitByExplosion",
+        type: SOCKET_TYPES.PLAYER_HIT_BY_EXPLOSION,
         row: newRow,
         col: newCol,
       });
@@ -394,7 +395,7 @@ export default class Player {
         if (room.map[newRow][newCol] === 3) {
           room.map[newRow][newCol] = 0;
           room.broadcast({
-            type: "destroyWall",
+            type: SOCKET_TYPES.WALL_DESTROY,
             position: { row: newRow, col: newCol },
             gift,
             index,
@@ -408,7 +409,7 @@ export default class Player {
           room.map[newRow][newCol] >= 5
         ) {
           room.broadcast({
-            type: "drawExplosion",
+            type: SOCKET_TYPES.EXPLOSION,
             position: { row: newRow, col: newCol },
             frames,
           });

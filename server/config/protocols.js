@@ -9,4 +9,8 @@ export const SOCKET_TYPES = {
   ADD_POWERUP: "rewardAdded",
   PLAYER_REMOVE: "removePlayer",
   WINNER: "theWinnerIs",
+  PUT_BOMB: "drawBomb",
+  REMOVE_BOMB: "removeBomb",
+  EXPLOSION: "drawExplosion",
+  WALL_DESTROY: "destroyWall"
 };
