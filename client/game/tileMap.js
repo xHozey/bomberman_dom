@@ -55,7 +55,6 @@ export default class Game {
 
         switch (tile) {
           case 1:
-          case 4:
             imgProps.src = "../images/wallBlack.png";
             divId = "wallfix";
             classname = "tile";

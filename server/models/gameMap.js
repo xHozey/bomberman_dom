@@ -40,7 +40,7 @@ export default class GameMap {
   }
 
   isWall(row, col) {
-    return this.getTile(row, col) === 1 || this.getTile(row, col) === 4;
+    return this.getTile(row, col) === 1;
   }
 
   isDestructibleWall(row, col) {
