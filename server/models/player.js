@@ -10,7 +10,6 @@ export default class Player {
     this.nickname = nickname;
     this.id = id;
     this.conn = conn;
-    this.bombsPlaced = 1;
     this.positionX = 52;
     this.positionY = 0;
     this.width = 21;
@@ -25,15 +24,7 @@ export default class Player {
     this.lastTimePlaceBomb = 0;
     this.fireRange = 1;
     this.maxBombs = 1;
-    this.powerups = {
-      bombing: false,
-      speed: false,
-      fire: false,
-    };
-    this.bombTimeout = null;
-    this.speedTimeout = null;
-    this.fireTimeout = null;
-    this.overlappingBombs = new Set();
+    this.placedBombs = new Set();
     this.userPx = 5;
   }
 
@@ -168,7 +159,7 @@ export default class Player {
             tileType === 1 ||
             tileType === 2 ||
             tileType === 3 ||
-            (tileType === 4 && !this.overlappingBombs.has(`${y}_${x}`))
+            (tileType === 4 && !this.placedBombs.has(`${y}_${x}`))
           ) {
             const tileLeft = x * GAME_CONFIG.TILE_SIZE;
             const tileTop = y * GAME_CONFIG.TILE_SIZE;
@@ -264,7 +255,7 @@ export default class Player {
     const tileKey = `${playerTileY}_${playerTileX}`;
 
     const toRemove = [];
-    for (const bombKey of this.overlappingBombs) {
+    for (const bombKey of this.placedBombs) {
       const [bombRow, bombCol] = bombKey.split("_").map(Number);
       const bombTileLeft = bombCol * GAME_CONFIG.TILE_SIZE;
       const bombTileTop = bombRow * GAME_CONFIG.TILE_SIZE;
@@ -281,7 +272,7 @@ export default class Player {
     }
 
     for (const key of toRemove) {
-      this.overlappingBombs.delete(key);
+      this.placedBombs.delete(key);
     }
 
     if (
@@ -291,25 +282,23 @@ export default class Player {
       playerTileX < room.map[0].length &&
       room.map[playerTileY][playerTileX] === 4
     ) {
-      this.overlappingBombs.add(tileKey);
+      this.placedBombs.add(tileKey);
     }
   }
 
   canPlaceBomb() {
-    return this.bombsPlaced <= this.maxBombs;
+    return this.placedBombs.length+1 <= this.maxBombs;
   }
 
   placeBomb(room) {
     if (this.isDead) return;
     if (
-      this.canPlaceBomb() &&
+      !this.canPlaceBomb() &&
       Date.now() - this.lastTimePlaceBomb < this.timePlaceBomb
     ) {
       return;
     }
     this.lastTimePlaceBomb = Date.now();
-
-    this.bombsPlaced++;
     const row = Math.floor((this.y + 20) / GAME_CONFIG.TILE_SIZE);
     const col = Math.floor((this.x + 20) / GAME_CONFIG.TILE_SIZE);
 
@@ -324,14 +313,13 @@ export default class Player {
       { x: -146, y: 36 },
     ];
 
-    this.overlappingBombs.add(`${row}_${col}`);
+    this.placedBombs.add(`${row}_${col}`);
     this._drawBomb(row, col, room);
 
     setTimeout(() => {
       this._removeBomb(row, col, room);
       this._destroyWall(row, col, frames, room);
-      this.overlappingBombs.delete(`${row}_${col}`);
-      this.bombsPlaced--;
+      this.placedBombs.delete(`${row}_${col}`);
     }, 3000);
   }
 
@@ -365,10 +353,10 @@ export default class Player {
     });
 
     const baseDirections = [
-      { dr: -1, dc: 0 },  // up
-      { dr: 1, dc: 0 },   // down
-      { dr: 0, dc: -1 },  // left
-      { dr: 0, dc: 1 }    // right
+      { dr: -1, dc: 0 },
+      { dr: 1, dc: 0 },
+      { dr: 0, dc: -1 },
+      { dr: 0, dc: 1 },
     ];
 
     baseDirections.forEach(({ dr, dc }) => {
@@ -382,7 +370,7 @@ export default class Player {
           newCol < 0 ||
           newCol >= room.map[0].length
         ) {
-          break; 
+          break;
         }
 
         room.broadcast({
@@ -410,9 +398,12 @@ export default class Player {
               frames,
             });
           }
-          break; // Stop propagating in this direction after destroying a wall
-        } else if (room.map[newRow][newCol] !== 0 && room.map[newRow][newCol] < 5) {
-          break; // Stop if we hit an indestructible wall (assuming values <5 are walls)
+          break;
+        } else if (
+          room.map[newRow][newCol] !== 0 &&
+          room.map[newRow][newCol] < 5
+        ) {
+          break;
         }
       }
     });
