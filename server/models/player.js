@@ -300,6 +300,7 @@ export default class Player {
   }
 
   placeBomb(room) {
+    if (this.isDead) return;
     if (
       this.canPlaceBomb() &&
       Date.now() - this.lastTimePlaceBomb < this.timePlaceBomb
@@ -307,26 +308,10 @@ export default class Player {
       return;
     }
     this.lastTimePlaceBomb = Date.now();
-    if (this.isDead) return;
 
     this.bombsPlaced++;
     const row = Math.floor((this.y + 20) / GAME_CONFIG.TILE_SIZE);
     const col = Math.floor((this.x + 20) / GAME_CONFIG.TILE_SIZE);
-
-    const directions = [
-      { dr: -this.fireRange, dc: 0 }, // Up
-      { dr: 0, dc: this.fireRange }, // Right
-      { dr: this.fireRange, dc: 0 }, // Down
-      { dr: 0, dc: -this.fireRange }, // Left
-    ];
-    if (this.powerups.fire) {
-      directions.push(
-        { dr: -2, dc: 0 }, // Up 2 tiles
-        { dr: 0, dc: 2 }, // Right 2 tiles
-        { dr: 2, dc: 0 }, // Down 2 tiles
-        { dr: 0, dc: -2 } // Left 2 tiles
-      );
-    }
 
     const frames = [
       { x: -5, y: 0 },
@@ -344,7 +329,7 @@ export default class Player {
 
     setTimeout(() => {
       this._removeBomb(row, col, room);
-      this._destroyWall(row, co, directions, frames, room);
+      this._destroyWall(row, col, frames, room);
       this.overlappingBombs.delete(`${row}_${col}`);
       this.bombsPlaced--;
     }, 3000);
@@ -366,7 +351,7 @@ export default class Player {
     });
   }
 
-  _destroyWall(row, col, directions, frames, room) {
+  _destroyWall(row, col, frames, room) {
     room.broadcast({
       type: SOCKET_TYPES.EXPLOSION,
       position: { row, col },
@@ -379,22 +364,39 @@ export default class Player {
       col,
     });
 
-    directions.forEach(({ dr, dc }) => {
-      const newRow = row + dr;
-      const newCol = col + dc;
+    const baseDirections = [
+      { dr: -1, dc: 0 },  // up
+      { dr: 1, dc: 0 },   // down
+      { dr: 0, dc: -1 },  // left
+      { dr: 0, dc: 1 }    // right
+    ];
 
-      room.broadcast({
-        type: SOCKET_TYPES.PLAYER_HIT_BY_EXPLOSION,
-        row: newRow,
-        col: newCol,
-      });
+    baseDirections.forEach(({ dr, dc }) => {
+      for (let i = 1; i <= this.fireRange; i++) {
+        const newRow = row + dr * i;
+        const newCol = col + dc * i;
 
-      if (
-        newRow >= 0 &&
-        newRow < room.map.length &&
-        newCol >= 0 &&
-        newCol < room.map[0].length
-      ) {
+        if (
+          newRow < 0 ||
+          newRow >= room.map.length ||
+          newCol < 0 ||
+          newCol >= room.map[0].length
+        ) {
+          break; 
+        }
+
+        room.broadcast({
+          type: SOCKET_TYPES.EXPLOSION,
+          position: { row: newRow, col: newCol },
+          frames,
+        });
+
+        room.broadcast({
+          type: SOCKET_TYPES.PLAYER_HIT_BY_EXPLOSION,
+          row: newRow,
+          col: newCol,
+        });
+
         if (room.map[newRow][newCol] === 3) {
           room.map[newRow][newCol] = 0;
           if (Math.random() < 0.3) {
@@ -408,15 +410,9 @@ export default class Player {
               frames,
             });
           }
-        } else if (
-          room.map[newRow][newCol] === 0 ||
-          room.map[newRow][newCol] >= 5
-        ) {
-          room.broadcast({
-            type: SOCKET_TYPES.EXPLOSION,
-            position: { row: newRow, col: newCol },
-            frames,
-          });
+          break; // Stop propagating in this direction after destroying a wall
+        } else if (room.map[newRow][newCol] !== 0 && room.map[newRow][newCol] < 5) {
+          break; // Stop if we hit an indestructible wall (assuming values <5 are walls)
         }
       }
     });
