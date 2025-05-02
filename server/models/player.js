@@ -10,7 +10,7 @@ export default class Player {
     this.nickname = nickname;
     this.id = id;
     this.conn = conn;
-    this.bombsPlaced = 0;
+    this.bombsPlaced = 1;
     this.positionX = 52;
     this.positionY = 0;
     this.width = 21;
@@ -295,9 +295,13 @@ export default class Player {
     }
   }
 
+  canPlaceBomb() {
+    return this.bombsPlaced <= this.maxBombs;
+  }
+
   placeBomb(room) {
     if (
-      !this.powerups.bombing &&
+      this.canPlaceBomb() &&
       Date.now() - this.lastTimePlaceBomb < this.timePlaceBomb
     ) {
       return;
@@ -305,15 +309,15 @@ export default class Player {
     this.lastTimePlaceBomb = Date.now();
     if (this.isDead) return;
 
-    this.bombsPlaced = 1;
+    this.bombsPlaced++;
     const row = Math.floor((this.y + 20) / GAME_CONFIG.TILE_SIZE);
     const col = Math.floor((this.x + 20) / GAME_CONFIG.TILE_SIZE);
 
     const directions = [
-      { dr: -1, dc: 0 }, // Up
-      { dr: 0, dc: 1 }, // Right
-      { dr: 1, dc: 0 }, // Down
-      { dr: 0, dc: -1 }, // Left
+      { dr: -this.fireRange, dc: 0 }, // Up
+      { dr: 0, dc: this.fireRange }, // Right
+      { dr: this.fireRange, dc: 0 }, // Down
+      { dr: 0, dc: -this.fireRange }, // Left
     ];
     if (this.powerups.fire) {
       directions.push(
@@ -342,6 +346,7 @@ export default class Player {
       this._removeBomb(row, col, room);
       this._destroyWall(row, co, directions, frames, room);
       this.overlappingBombs.delete(`${row}_${col}`);
+      this.bombsPlaced--;
     }, 3000);
   }
 
@@ -486,55 +491,15 @@ export default class Player {
   }
 
   collectpowerup(powerupType) {
-    const powerupDurations = {
-      bomb: 10000,
-      speed: 10000,
-      fire: 10000,
-    };
-
-    const resetpowerup = (type) => {
-      switch (type) {
-        case "bomb":
-          this.powerups.bombing = false;
-          break;
-        case "speed":
-          this.powerups.speed = false;
-          this.speed = 25;
-          break;
-        case "fire":
-          this.powerups.fire = false;
-          break;
-        default:
-          logger.warn(`Unknown powerup type: ${type}`);
-      }
-      this.sendPlayerStatsUpdate();
-    };
-
     switch (powerupType) {
       case "bomb":
-        this.powerups.bombing = true;
-        clearTimeout(this.bombTimeout);
-        this.bombTimeout = setTimeout(
-          () => resetpowerup("bomb"),
-          powerupDurations.bomb
-        );
+        this.maxBombs++;
         break;
       case "speed":
-        this.powerups.speed = true;
-        this.speed = 50;
-        clearTimeout(this.speedTimeout);
-        this.speedTimeout = setTimeout(
-          () => resetpowerup("speed"),
-          powerupDurations.speed
-        );
+        this.speed += 10;
         break;
       case "fire":
-        this.powerups.fire = true;
-        clearTimeout(this.fireTimeout);
-        this.fireTimeout = setTimeout(
-          () => resetpowerup("fire"),
-          powerupDurations.fire
-        );
+        this.fireRange++;
         break;
       default:
         logger.warn(`Unknown powerup type: ${powerupType}`);
@@ -548,9 +513,9 @@ export default class Player {
     this.conn.send(
       safeStringify({
         type: SOCKET_TYPES.PLAYER_STATS,
-        bombPower: this.powerups.bombing,
-        speed: this.powerups.speed,
-        fire: this.powerups.fire,
+        bombPower: this.maxBombs,
+        speed: this.speed,
+        fire: this.fireRange,
       })
     );
   }
