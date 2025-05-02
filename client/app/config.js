@@ -31,6 +31,7 @@ export function GamePage() {
         }),
 
         jsx('div', {
+            style: 'display: none;',
             id: 'popup-msg',
             ref: Ref.popupRef,
         }),
