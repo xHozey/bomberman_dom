@@ -10,8 +10,6 @@ export default class Player {
     this.nickname = nickname;
     this.id = id;
     this.conn = conn;
-    this.positionX = 52;
-    this.positionY = 0;
     this.width = 21;
     this.height = 40;
     this.lives = 3;
@@ -69,33 +67,6 @@ export default class Player {
         break;
     }
 
-    const spriteMap = {
-      up: [
-        { x: 55, y: 82 },
-        { x: 28, y: 82 },
-        { x: 55, y: 82 },
-        { x: 81, y: 82 },
-      ],
-      right: [
-        { x: 30, y: 41 },
-        { x: 55, y: 41 },
-        { x: 30, y: 41 },
-        { x: -5, y: 41 },
-      ],
-      down: [
-        { x: 52, y: 0 },
-        { x: 27, y: 0 },
-        { x: 52, y: 0 },
-        { x: 78, y: 0 },
-      ],
-      left: [
-        { x: -5, y: 124 },
-        { x: 30, y: 124 },
-        { x: -5, y: 124 },
-        { x: 82, y: 124 },
-      ],
-    };
-
     if (this._checkCollision(room)) {
       this.x = prevX;
       this.y = prevY;
@@ -105,35 +76,17 @@ export default class Player {
     }
 
     if (this.isMoving) {
-      const currentSprite = spriteMap[this.direction];
-      if (!this.movementStartTime) this.movementStartTime = Date.now();
-      const elapsed = Date.now() - this.movementStartTime;
-      const frameDuration = 200;
-      const frameIndex =
-        Math.floor(elapsed / frameDuration) % currentSprite.length;
-      this.positionX = currentSprite[frameIndex].x;
-      this.positionY = currentSprite[frameIndex].y;
-
       const moveData = {
         type: SOCKET_TYPES.PLAYER_MOVE,
         position: {
           x: this.x,
           y: this.y,
-          spriteX: this.positionX,
-          spriteY: this.positionY,
-          direction: this.direction,
         },
+        direction: this.direction,
         Id: this.id,
       };
 
       room.broadcast(moveData);
-    } else if (this.movementStartTime) {
-      const frames = spriteMap[this.direction];
-      if (frames) {
-        this.positionX = frames[0].x;
-        this.positionY = frames[0].y;
-      }
-      this.movementStartTime = null;
     }
   }
 
@@ -287,7 +240,7 @@ export default class Player {
   }
 
   canPlaceBomb() {
-    return this.placedBombs.length+1 <= this.maxBombs;
+    return this.placedBombs.length + 1 <= this.maxBombs;
   }
 
   placeBomb(room) {

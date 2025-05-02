@@ -5,6 +5,7 @@ import { MyEventSystem } from "../src/event.js";
 import { Router } from "../src/router.js";
 import TileMap from "./tileMap.js";
 import { playersElement } from "./tileMap.js";
+import createSpriteAnimator from "./spriteAnimator.js";
 
 const router = new Router({
   "/": () => [LoginPage()],
@@ -266,24 +267,52 @@ function animationPlayerDead(data) {
   animateDeath();
 }
 
+const playerAnimator = createSpriteAnimator({
+  spriteWidth: 28,
+  spriteHeight: 40,
+  frameIndices: [0, 1, 2, 3],
+  frameSlow: 6,
+  directionRows: {
+    right: 1,
+    left: 3,
+    up: 2,
+    down: 0,
+  },
+});
+
+const bombAnimator = createSpriteAnimator({
+  spriteWidth: 28,
+  spriteHeight: 40,
+  frameIndices: [0, 1, 2, 3],
+  frameSlow: 6,
+  directionRows: {
+    up: 0,
+    down: 1,
+  },
+});
+
 function updateOtherPlayerPosition(data) {
   let playerElement = playersElement.get(data.Id);
   if (!playerElement) {
     console.log("player not found", data.Id);
     return;
   }
-  playerElement.style.backgroundPositionY = data.position.spriteY + "px";
-  playerElement.style.backgroundPositionX = data.position.spriteX + "px";
+
+  const sprite = playerAnimator.getSpritePosition(data.direction);
+  playerElement.style.backgroundPosition = `${sprite.x}px ${sprite.y}px`;
   playerElement.style.transform = `translate(${data.position.x}px, ${data.position.y}px)`;
 }
 
-function updatePlayerCount(count, playerId,countP) {
+function updatePlayerCount(count, playerId, countP) {
   gameState.playerCount = count;
   let progressText = "";
   if (countP === null) {
-    progressText =  "Game..."
+    progressText = "Game...";
   } else {
-      progressText = countP < 20 ? `Game starting soon... ${countP}s` : "Game starting soon...";
+    progressText =
+      countP < 20
+        ? `Game starting soon... ${countP}s`
+        : "Game starting soon...";
   }
   if (waitingContainer) {
     const updatedWaitingContent = jsx(
@@ -428,7 +457,6 @@ function destroyWall(row, col, gift, index, frames) {
         '<img src="' +
         power[index] +
         '" style="width: 38px; height: 38px; position: absolute; top: 0; left: 0;">';
-      //gift = false;
     } else {
       tileElement.innerHTML = "";
       drawExplosion(row, col, frames);
@@ -436,35 +464,53 @@ function destroyWall(row, col, gift, index, frames) {
   }
 }
 
-function drawExplosion(row, col, frames) {
+const explosionAnimator = createSpriteAnimator({
+  spriteWidth: 38,
+  spriteHeight: 38,
+  frameIndices: [0, 1, 2, 3, 4],
+  frameSlow: 6,
+  directionRows: {
+    top: 0,
+    down: 1,
+  },
+});
+
+function drawExplosion(row, col, direction = "top") {
   const canvas = Ref.gameCanvasRef.current;
   const tileElement = Selectbyrowcol(canvas, row, col);
 
-  let currentFrame = 0;
   const frameDuration = 75;
+  let animationTicks = 0;
+  const totalTicks =
+    explosionAnimator.frameIndices.length * explosionAnimator.frameSlow;
 
   const explosionDiv = jsx("div", {
     className: "damage",
-    style: `background-position: ${frames[0].x}px ${frames[0].y}px;
-          background-image: url('../images/explosion.png');
-          width: 38px;
-          height: 38px;
-          z-index: 6;
-          left: 50%;
-          top: 50%;`,
+    style: `background-image: url('../images/explosion.png');
+            width: 38px;
+            height: 38px;
+            z-index: 6;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            background-position: 0px 0px;`, 
   });
 
   const explosionElement = createElement(explosionDiv);
   tileElement.appendChild(explosionElement);
 
   const animate = () => {
-    if (currentFrame >= frames.length) {
+    if (animationTicks >= totalTicks) {
       explosionElement.remove();
       return;
     }
 
-    explosionElement.style.backgroundPosition = `${frames[currentFrame].x}px ${frames[currentFrame].y}px`;
-    currentFrame++;
+    const { x, y } = explosionAnimator.getSpritePosition(direction);
+
+    explosionElement.style.backgroundPosition = `-${x}px -${y}px`;
+
+    animationTicks++;
 
     setTimeout(animate, frameDuration);
   };
@@ -481,12 +527,11 @@ function hasclass(tile, className) {
   }
   return false;
 }
+
 function Selectbyrowcol(canvas, row, col) {
   let tileElement = null;
   for (let i = 0; i < canvas.children.length; i++) {
     const child = canvas.children[i];
-
-    // Make sure dataset exists and compare row/column
     if (
       child.dataset &&
       child.dataset.row === String(row) &&
