@@ -1,6 +1,6 @@
 import { LoginPage, GamePage, gameState, Ref } from "./utils.js";
 import { jsx } from "../src/framework.js";
-import { drawExplosion  } from "./bombs.js";
+import { drawExplosion } from "./bombs.js";
 import { render, updateRender } from "../src/vdom.js";
 import { Router } from "../src/router.js";
 import { chat } from "./chat.js";
@@ -33,15 +33,6 @@ export function waiting(element) {
 
   render(waitingContent, element);
 }
-
-//socket
-
-
-//players
-
-
-//powerups
-
 
 //game
 function startGame(data, tileMap) {
@@ -93,10 +84,6 @@ function GoToGame(data, tileMap) {
   broadcastPlayerInfo(data);
   chat(data.nickname);
 }
-
-//chat
-
-//boom
 
 //wall
 function destroyWall(row, col, gift, index, frames) {
@@ -182,7 +169,7 @@ function broadcastPlayerInfo(data) {
 
   //   updateRender(playerList, playersElement);
 }
-export{
+export {
   hasclass,
   destroyWall,
   startGame,

@@ -1,10 +1,10 @@
 import TileMap from "./map.js";
 
 // export default function draw(canvas ){
-const tileSize = 32;
+const tileSize = 40;
 const tileMap = new TileMap(tileSize);
-function gameLoop(){
+function gameLoop() {
     tileMap.drawGame()
 }
-setInterval(gameLoop   ,1000/60)
+setInterval(gameLoop, 1000 / 60)
 // }

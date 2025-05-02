@@ -1,18 +1,18 @@
 import { MyEventSystem } from "../src/event.js";
 import { createElement, jsx } from "../src/framework.js";
-import { socket } from "./socket.js";
+import { socket } from "./index.js";
 
 export const playersElement = new Map();
 export default class Game {
   constructor(tileSize, data) {
-    this.tileSize = tileSize;
+    this.tileSize = tileSize; // Pixel size of a tile for rendering
     this.players = data.players.length;
     this.wall = this.#image("wallBlack.png");
     this.bombs = [];
     this.MyId = data.MyId;
     this.map = data.map;
     this.canvas = null;
-    this.controlsInitialized = false; 
+    this.controlsInitialized = false;
     this.keydownHandler = null;
     this.keyupHandler = null;
   }
@@ -31,7 +31,6 @@ export default class Game {
   }
 
   #draw(canvas, data) {
-
     const rows = this.map.length;
     const columns = this.map[0].length;
 
@@ -41,52 +40,35 @@ export default class Game {
     canvas.style.gridTemplateColumns = `repeat(${columns}, ${this.tileSize}px)`;
     canvas.style.alignContent = "center";
     canvas.style.justifyContent = "center";
-    canvas.style.position = "relative"; // FIX: Add position relative to allow absolute positioning of children
+    canvas.style.position = "relative";
 
     for (let row = 0; row < rows; row++) {
       for (let column = 0; column < columns; column++) {
         const tile = this.map[row][column];
         const imgProps = {};
-        let divStyle = ""; // for inline styles
+        let divStyle = "";
         let classname = "";
         let divId = "";
-        let initialX = 0;
-        let initialY = 0;
 
         switch (tile) {
+          case 0:
+            classname = "tile";
+            break;
           case 1:
             imgProps.src = "../images/wallBlack.png";
             divId = "wallfix";
             classname = "tile";
             break;
           case 2:
-            imgProps.src = "../images/tree.png";
-            divId = "WallBreak";
-            classname = "tile";
-            break;
-          case 3:
             imgProps.src = "../images/wall.png";
             divId = "WallBreak";
             classname = "tile";
             break;
-          case 0:
-            classname = "tile";
-            break;
           case 5:
-            initialX = column * this.tileSize;
-            initialY = row * this.tileSize;
-            break;
           case 6:
-            initialX = column * this.tileSize;
-            initialY = row * this.tileSize;
-            break;
           case 7:
-            initialX = column * this.tileSize;
-            initialY = row * this.tileSize;
-            break;
           case 8:
-            initialX = column * this.tileSize;
-            initialY = row * this.tileSize;
+            classname = "tile";
             break;
           default:
             classname = "tile";
@@ -102,8 +84,6 @@ export default class Game {
             "data-column": column,
             id: divId || `tile_${row}_${column}`,
             style: divStyle ? `background-image: ${divStyle}` : "",
-            "data-initial-x": initialX, 
-            "data-initial-y": initialY, 
           },
           imgnode
         );
@@ -119,21 +99,23 @@ export default class Game {
             "url('../images/playerGreen.png')",
             "url('../images/playerYallow.png')",
           ];
-          const playerVNode = jsx(
-            "div",
-            {
-              className: "player",
-              id: `player_${data.players[playerIndex].id}`,
-              style: `
+
+          // Convert world units to pixels
+          const playerX = data.players[playerIndex].x * this.tileSize;
+          const playerY = data.players[playerIndex].y * this.tileSize;
+
+          const playerVNode = jsx("div", {
+            className: "player",
+            id: `player_${data.players[playerIndex].id}`,
+            style: `
                 background-image: ${playerStyles[playerIndex]};
-                width: 27px;
-                height: 40px;
+                width: ${Math.floor(this.tileSize * 0.8)}px;
+                height: ${Math.floor(this.tileSize * 0.8)}px;
                 position: absolute;
                 z-index: 10;
-                transform: translate(${initialX}px, ${initialY}px);
-              `
-            }
-          );          
+                transform: translate(${playerX}px, ${playerY}px);
+              `,
+          });
           const playerDiv = createElement(playerVNode);
           playersElement.set(data.players[playerIndex].id, playerDiv);
           canvas.appendChild(playerDiv);
@@ -152,15 +134,15 @@ export default class Game {
       console.log("Controls are already initialized, using existing handlers");
       return;
     }
-  
+
     let keysPressed = {};
     let lastUpdateTime = Date.now();
     let lastSendTime = 0;
-    const updateInterval = 50;
+    const updateInterval = 16;
     this.keydownHandler = (e) => {
       if (e.target.tagName == "INPUT" || e.target.tagName == "TEXTAREA") return;
       keysPressed[e.key] = true;
-  
+
       if ((e.key === "b" || e.key === "B") && !e.repeat) {
         if (socket && socket.readyState === WebSocket.OPEN) {
           socket.send(
@@ -171,24 +153,24 @@ export default class Game {
         }
       }
     };
-  
+
     this.keyupHandler = (e) => {
       keysPressed[e.key] = false;
     };
-  
+
     MyEventSystem.addEventListener(window, "keydown", this.keydownHandler);
     MyEventSystem.addEventListener(window, "keyup", this.keyupHandler);
-  
+
     const updatePlayerMovement = () => {
       if (!this.controlsInitialized) {
         console.log("Controls are not initialized, skipping update");
         return;
       }
-      
+
       const now = Date.now();
-      const deltaTime = (now - lastUpdateTime) / 100;
+      const deltaTime = (now - lastUpdateTime) / 1000;
       lastUpdateTime = now;
-  
+
       let direction;
       if (keysPressed["w"] || keysPressed["W"]) {
         direction = "up";
@@ -202,8 +184,8 @@ export default class Game {
       if (keysPressed["a"] || keysPressed["A"]) {
         direction = "left";
       }
-  
-      if (now - lastSendTime > updateInterval) {
+
+      if (now - lastSendTime > updateInterval && direction) {
         if (socket && socket.readyState === WebSocket.OPEN) {
           socket.send(
             JSON.stringify({
@@ -215,21 +197,21 @@ export default class Game {
           lastSendTime = now;
         }
       }
-  
+
       if (this.controlsInitialized) {
         requestAnimationFrame(updatePlayerMovement);
       }
     };
-  
+
     this.controlsInitialized = true;
     updatePlayerMovement();
   }
+
   cleanup() {
     this.controlsInitialized = false;
     console.log("TileMap controls cleaned up");
   }
 }
-
-export{
+export {
   Game
 }

@@ -36,6 +36,7 @@ function connectToGameServer(name) {
         console.log("Disconnected from WebSocket server");
     };
 }
+
 let tileMap;
 function handleServerMessages(data) {
     const tileSize = 40;
@@ -107,6 +108,7 @@ function handleServerMessages(data) {
             break;
     }
 }
+
 function theWinnerIs(data) {
     let gamepage = Ref.gamePageRef.current;
     const winScreen = jsx(

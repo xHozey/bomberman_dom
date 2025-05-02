@@ -3,6 +3,7 @@ import { jsx } from '../src/framework.js';
 import { Ref } from "./utils.js"
 import { updateRender } from "../src/vdom.js";
 import { playersElement } from "./map.js";
+import { createSpriteAnimator } from "./spriteanimator.js";
 
 // Game state variable
 export let gameState = {
@@ -84,16 +85,36 @@ function animationPlayerDead(data) {
 
     animateDeath();
 }
+
+const playerAnimator = createSpriteAnimator({
+    spriteWidth: 28,
+    spriteHeight: 40,
+    frameIndices: [0, 1, 2, 3],
+    frameSlow: 6,
+    directionRows: {
+        right: 1,
+        left: 3,
+        up: 2,
+        down: 4,
+    },
+});
 function updateOtherPlayerPosition(data) {
     let playerElement = playersElement.get(data.Id);
     if (!playerElement) {
         console.log("player not found", data.Id);
         return;
     }
-    playerElement.style.backgroundPositionY = data.position.spriteY + "px";
-    playerElement.style.backgroundPositionX = data.position.spriteX + "px";
-    playerElement.style.transform = `translate(${data.position.x}px, ${data.position.y}px)`;
+
+    const sprite = playerAnimator.getSpritePosition(data.direction);
+    playerElement.style.backgroundPosition = `${sprite.x}px ${sprite.y}px`;
+
+    // Convert world units to pixels
+    const pixelX = data.position.x * 40; // 40 is the default tileSize
+    const pixelY = data.position.y * 40;
+
+    playerElement.style.transform = `translate(${pixelX}px, ${pixelY}px)`;
 }
+
 function updatePlayerCount(count, playerId, countP) {
     gameState.playerCount = count;
     let progressText = "";
