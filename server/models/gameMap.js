@@ -12,7 +12,7 @@ export default class GameMap {
       for (let j = 0; j < this.map[i].length; j++) {
         if (this.map[i][j] == 0) {
           if (Math.random() < 0.8) {
-            this.map[i][j] = 3;
+            this.map[i][j] = 2;
           }
         }
         if (this.map[i][j] == 9) {

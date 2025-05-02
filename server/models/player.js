@@ -101,19 +101,14 @@ export default class Player {
         if (y >= 0 && y < room.map.length && x >= 0 && x < room.map[0].length) {
           const tileType = room.map[y][x];
 
-          if (
-            tileType === 1 || // Wall
-            tileType === 2 || // Tree
-            tileType === 3 || // Breakable wall
-            tileType === 4
-          ) {
+          if (tileType === 1 || tileType === 2 || tileType === 3) {
             if (
               playerRight > x &&
               playerLeft < x + 1 &&
               playerBottom > y &&
               playerTop < y + 1
             ) {
-              return true; // Collision detected
+              return true; 
             }
           }
         }
@@ -151,10 +146,10 @@ export default class Player {
   }
 
   _drawBomb(row, col, room) {
-    if (room.map[row][col] === 4) return;
+    if (room.map[row][col] === 3) return;
     setTimeout(() => {
-      room.map[row][col] = 4;
-    }, 600);
+      room.map[row][col] = 3;
+    }, 800);
     room.broadcast({
       type: SOCKET_TYPES.PUT_BOMB,
       position: { row, col },
@@ -216,7 +211,7 @@ export default class Player {
           col: newCol,
         });
 
-        if (room.map[newRow][newCol] === 3) {
+        if (room.map[newRow][newCol] === 2) {
           room.map[newRow][newCol] = 0;
           if (Math.random() < 0.3) {
             const index = Math.floor(Math.random() * 3);

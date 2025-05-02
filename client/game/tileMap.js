@@ -51,22 +51,17 @@ export default class Game {
         let divId = "";
 
         switch (tile) {
+          case 0:
+            classname = "tile";
+            break;
           case 1:
             imgProps.src = "../images/wallBlack.png";
             divId = "wallfix";
             classname = "tile";
             break;
           case 2:
-            imgProps.src = "../images/tree.png";
-            divId = "WallBreak";
-            classname = "tile";
-            break;
-          case 3:
             imgProps.src = "../images/wall.png";
             divId = "WallBreak";
-            classname = "tile";
-            break;
-          case 0:
             classname = "tile";
             break;
           case 5:
@@ -104,26 +99,23 @@ export default class Game {
             "url('../images/playerGreen.png')",
             "url('../images/playerYallow.png')",
           ];
-          
+
           // Convert world units to pixels
           const playerX = data.players[playerIndex].x * this.tileSize;
           const playerY = data.players[playerIndex].y * this.tileSize;
-          
-          const playerVNode = jsx(
-            "div",
-            {
-              className: "player",
-              id: `player_${data.players[playerIndex].id}`,
-              style: `
+
+          const playerVNode = jsx("div", {
+            className: "player",
+            id: `player_${data.players[playerIndex].id}`,
+            style: `
                 background-image: ${playerStyles[playerIndex]};
                 width: ${Math.floor(this.tileSize * 0.8)}px;
                 height: ${Math.floor(this.tileSize * 0.8)}px;
                 position: absolute;
                 z-index: 10;
                 transform: translate(${playerX}px, ${playerY}px);
-              `
-            }
-          );
+              `,
+          });
           const playerDiv = createElement(playerVNode);
           playersElement.set(data.players[playerIndex].id, playerDiv);
           canvas.appendChild(playerDiv);
@@ -176,7 +168,7 @@ export default class Game {
       }
 
       const now = Date.now();
-      const deltaTime = (now - lastUpdateTime) / 1000; // Convert to seconds
+      const deltaTime = (now - lastUpdateTime) / 1000;
       lastUpdateTime = now;
 
       let direction;
