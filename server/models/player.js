@@ -17,13 +17,14 @@ export default class Player {
     this.height = 40;
     this.lives = 3;
     this.speed = 25;
-    this.fire = 1;
     this.isMoving = false;
     this.isDead = false;
     this.direction = "up";
     this.movementStartTime = null;
     this.timePlaceBomb = 3000;
     this.lastTimePlaceBomb = 0;
+    this.fireRange = 1;
+    this.maxBombs = 1;
     this.powerups = {
       bombing: false,
       speed: false,
@@ -307,8 +308,6 @@ export default class Player {
     this.bombsPlaced = 1;
     const row = Math.floor((this.y + 20) / GAME_CONFIG.TILE_SIZE);
     const col = Math.floor((this.x + 20) / GAME_CONFIG.TILE_SIZE);
-    const gift = Math.random() < 0.3;
-    const index = Math.floor(Math.random() * 3);
 
     const directions = [
       { dr: -1, dc: 0 }, // Up
@@ -341,7 +340,7 @@ export default class Player {
 
     setTimeout(() => {
       this._removeBomb(row, col, room);
-      this._destroyWall(row, col, gift, index, directions, frames, room);
+      this._destroyWall(row, co, directions, frames, room);
       this.overlappingBombs.delete(`${row}_${col}`);
     }, 3000);
   }
@@ -362,7 +361,7 @@ export default class Player {
     });
   }
 
-  _destroyWall(row, col, gift, index, directions, frames, room) {
+  _destroyWall(row, col, directions, frames, room) {
     room.broadcast({
       type: SOCKET_TYPES.EXPLOSION,
       position: { row, col },
@@ -393,15 +392,16 @@ export default class Player {
       ) {
         if (room.map[newRow][newCol] === 3) {
           room.map[newRow][newCol] = 0;
-          room.broadcast({
-            type: SOCKET_TYPES.WALL_DESTROY,
-            position: { row: newRow, col: newCol },
-            gift,
-            index,
-            frames,
-          });
-          if (gift) {
+          if (Math.random() < 0.3) {
+            const index = Math.floor(Math.random() * 3);
             room.addpowerup(newRow, newCol, index);
+            room.broadcast({
+              type: SOCKET_TYPES.WALL_DESTROY,
+              position: { row: newRow, col: newCol },
+              gift: true,
+              index,
+              frames,
+            });
           }
         } else if (
           room.map[newRow][newCol] === 0 ||
