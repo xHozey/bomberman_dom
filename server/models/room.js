@@ -64,5 +64,9 @@ export default class Room {
 
   removepowerup(row, col) {
     delete this.powerups[`${row}_${col}`];
+    this.broadcast({
+      type: SOCKET_TYPES.powerup_COLLECTED,
+      position: { row, col },
+    });
   }
 }

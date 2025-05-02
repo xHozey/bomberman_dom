@@ -3,7 +3,7 @@ import { GAME_CONFIG } from "../config/gameConfig.js";
 export default class GameMap {
   constructor() {
     this.map = JSON.parse(JSON.stringify(GAME_CONFIG.MAP));
-    this.tileSize = GAME_CONFIG.TILE_SIZE;
+    this.tileSize = 1;
     this.randomizeBricks();
   }
 
@@ -28,8 +28,8 @@ export default class GameMap {
       if (pos) {
         const [row, col] = pos;
         this.map[row][col] = 5 + i;
-        players[i].x = col * this.tileSize;
-        players[i].y = row * this.tileSize;
+        players[i].x = col;
+        players[i].y = row;
       }
     }
   }

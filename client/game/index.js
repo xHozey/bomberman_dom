@@ -289,7 +289,12 @@ function updateOtherPlayerPosition(data) {
 
   const sprite = playerAnimator.getSpritePosition(data.direction);
   playerElement.style.backgroundPosition = `${sprite.x}px ${sprite.y}px`;
-  playerElement.style.transform = `translate(${data.position.x}px, ${data.position.y}px)`;
+  
+  // Convert world units to pixels
+  const pixelX = data.position.x * 40; // 40 is the default tileSize
+  const pixelY = data.position.y * 40;
+  
+  playerElement.style.transform = `translate(${pixelX}px, ${pixelY}px)`;
 }
 
 function updatePlayerCount(count, playerId, countP) {

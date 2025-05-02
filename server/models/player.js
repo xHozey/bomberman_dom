@@ -1,19 +1,17 @@
 import { safeStringify } from "../utils/helpers.js";
-import { GAME_CONFIG } from "../config/gameConfig.js";
 import { logger } from "../utils/logger.js";
 import { SOCKET_TYPES } from "../config/protocols.js";
 export default class Player {
   constructor(nickname, id, conn, room) {
     this.room = room;
-    this.x = 0;
-    this.y = 0;
+    this.x = 0; // World units (1 unit = 1 tile)
+    this.y = 0; // World units (1 unit = 1 tile)
     this.nickname = nickname;
     this.id = id;
     this.conn = conn;
-    this.width = 21;
-    this.height = 40;
+    this.size = 1;
     this.lives = 3;
-    this.speed = 25;
+    this.speed = 6;
     this.isMoving = false;
     this.isDead = false;
     this.direction = "up";
@@ -23,7 +21,7 @@ export default class Player {
     this.fireRange = 1;
     this.maxBombs = 1;
     this.placedBombs = new Set();
-    this.userPx = 5;
+    this.collisionPadding = 0.1; // Collision padding in world units
   }
 
   loseLife() {
@@ -36,29 +34,29 @@ export default class Player {
 
   updateMove(data, room) {
     if (this.isDead) return;
-    const deltaTime = data.deltaTime || 0.016;
-    const moveSpeed = this.speed * deltaTime;
+    const deltaTime = data.deltaTime || 0.016; // Seconds
+    const moveSpeed = this.speed * deltaTime; // World units per frame
     const prevX = this.x;
     const prevY = this.y;
 
     switch (data.direction) {
       case "up":
-        this.y -= moveSpeed;
+        this.y = Math.max(0, this.y - moveSpeed);
         this.direction = "up";
         this.isMoving = true;
         break;
       case "down":
-        this.y += moveSpeed;
+        this.y = Math.min(room.map.length - this.size, this.y + moveSpeed);
         this.direction = "down";
         this.isMoving = true;
         break;
       case "left":
-        this.x -= moveSpeed;
+        this.x = Math.max(0, this.x - moveSpeed);
         this.direction = "left";
         this.isMoving = true;
         break;
       case "right":
-        this.x += moveSpeed;
+        this.x = Math.min(room.map[0].length - this.size, this.x + moveSpeed);
         this.direction = "right";
         this.isMoving = true;
         break;
@@ -91,107 +89,36 @@ export default class Player {
   }
 
   _checkCollision(room) {
-    const playerLeft = this.x;
-    const playerTop = this.y;
-    const playerRight = this.x + this.width;
-    const playerBottom = this.y + this.height;
+    // Get player bounds in world units
+    const playerLeft = this.x + this.collisionPadding;
+    const playerTop = this.y + this.collisionPadding;
+    const playerRight = this.x + this.size - this.collisionPadding;
+    const playerBottom = this.y + this.size - this.collisionPadding;
 
-    const playerCenterX = this.x + this.width / 2;
-    const playerCenterY = this.y + this.height / 2;
-    const playerTileX = Math.floor(playerCenterX / GAME_CONFIG.TILE_SIZE);
-    const playerTileY = Math.floor(playerCenterY / GAME_CONFIG.TILE_SIZE);
+    // Check surrounding tiles
+    const minTileX = Math.floor(playerLeft);
+    const maxTileX = Math.ceil(playerRight);
+    const minTileY = Math.floor(playerTop);
+    const maxTileY = Math.ceil(playerBottom);
 
-    for (let y = playerTileY - 1; y <= playerTileY + 1; y++) {
-      for (let x = playerTileX - 1; x <= playerTileX + 1; x++) {
+    for (let y = minTileY; y < maxTileY; y++) {
+      for (let x = minTileX; x < maxTileX; x++) {
         if (y >= 0 && y < room.map.length && x >= 0 && x < room.map[0].length) {
           const tileType = room.map[y][x];
-          const tileTypes =
-            x + 1 < room.map[0].length ? room.map[y][x + 1] : null;
 
           if (
-            tileType === 1 ||
-            tileType === 2 ||
-            tileType === 3 ||
-            (tileType === 4 && !this.placedBombs.has(`${y}_${x}`))
+            tileType === 1 || // Wall
+            tileType === 2 || // Tree
+            tileType === 3 || // Breakable wall
+            (tileType === 4 && !this.placedBombs.has(`${y}_${x}`)) // Bomb not placed by this player
           ) {
-            const tileLeft = x * GAME_CONFIG.TILE_SIZE;
-            const tileTop = y * GAME_CONFIG.TILE_SIZE;
-            const tileRight = tileLeft + GAME_CONFIG.TILE_SIZE;
-            const tileBottom = tileTop + GAME_CONFIG.TILE_SIZE;
-
             if (
-              playerLeft < tileRight - 6 &&
-              playerRight > tileLeft - 4 &&
-              playerTop < tileBottom - 16 &&
-              playerBottom > tileTop
+              playerRight > x &&
+              playerLeft < x + 1 &&
+              playerBottom > y &&
+              playerTop < y + 1
             ) {
-              if (this.direction === "down") {
-                const rightEdgeCollision =
-                  Math.abs(playerRight - tileLeft + 5) <= 19.75;
-                const right = Math.abs(playerRight - tileLeft) > 38;
-
-                if (tileType === 0 || tileTypes === 0) {
-                  if (rightEdgeCollision && playerLeft <= tileLeft) {
-                    this.userPx = Math.min(this.userPx + 0.5, 9);
-                    this.x -= this.userPx;
-                    return false;
-                  }
-                  if (right && playerLeft >= tileLeft) {
-                    this.userPx = Math.min(this.userPx + 1, 6);
-                    this.x += this.userPx;
-                    return false;
-                  }
-                }
-                return true;
-              }
-
-              if (this.direction === "up") {
-                const rightEdgeCollision =
-                  Math.abs(playerRight - tileLeft + 5) >= 48 ||
-                  Math.abs(playerRight - tileLeft) <= 13;
-
-                if (tileType === 0 || tileTypes === 0) {
-                  if (rightEdgeCollision) {
-                    if (playerLeft <= tileLeft) {
-                      this.userPx = Math.min(this.userPx + 1, 9);
-                      this.x -= this.userPx;
-                    } else if (playerRight >= tileLeft) {
-                      this.userPx = Math.min(this.userPx + 1, 9);
-                      this.x += this.userPx;
-                    }
-                    return false;
-                  }
-                }
-                this.y -= this.userPx;
-                return true;
-              }
-
-              if (this.direction === "left") {
-                if (tileType === 0 || tileTypes === 0) {
-                  const bottomEdgeCollision =
-                    Math.abs(playerBottom - tileTop) < 15 && tileTop > 0;
-                  if (bottomEdgeCollision) {
-                    this.userPx = Math.min(this.userPx + 1, 6);
-                    this.y -= this.userPx;
-                    return false;
-                  }
-                }
-                return true;
-              }
-
-              if (this.direction === "right") {
-                if (tileType === 0 || tileTypes === 0) {
-                  const rightEdgeCollision =
-                    Math.abs(playerBottom - tileTop) < 15;
-                  if (rightEdgeCollision && playerBottom > tileTop) {
-                    this.userPx = Math.min(this.userPx + 1, 6);
-                    this.y -= this.userPx;
-                    this.x += this.userPx;
-                    return false;
-                  }
-                }
-                return true;
-              }
+              return true; // Collision detected
             }
           }
         }
@@ -201,25 +128,22 @@ export default class Player {
   }
 
   _updateBombOverlap(room) {
-    const playerCenterX = this.x + this.width / 2;
-    const playerCenterY = this.y + this.height / 2;
-    const playerTileX = Math.floor(playerCenterX / GAME_CONFIG.TILE_SIZE);
-    const playerTileY = Math.floor(playerCenterY / GAME_CONFIG.TILE_SIZE);
+    const playerCenterX = this.x + this.size / 2;
+    const playerCenterY = this.y + this.size / 2;
+    const playerTileX = Math.floor(playerCenterX);
+    const playerTileY = Math.floor(playerCenterY);
     const tileKey = `${playerTileY}_${playerTileX}`;
 
     const toRemove = [];
     for (const bombKey of this.placedBombs) {
       const [bombRow, bombCol] = bombKey.split("_").map(Number);
-      const bombTileLeft = bombCol * GAME_CONFIG.TILE_SIZE;
-      const bombTileTop = bombRow * GAME_CONFIG.TILE_SIZE;
-      const bombTileRight = bombTileLeft + GAME_CONFIG.TILE_SIZE;
-      const bombTileBottom = bombTileTop + GAME_CONFIG.TILE_SIZE;
 
+      // Check if player is outside the bomb tile
       const outside =
-        this.x + this.width < bombTileLeft ||
-        this.x > bombTileRight - 6 ||
-        this.y + this.height < bombTileTop ||
-        this.y > bombTileBottom - 16;
+        this.x > bombCol + 1 ||
+        this.x + this.size < bombCol ||
+        this.y > bombRow + 1 ||
+        this.y + this.size < bombRow;
 
       if (outside) toRemove.push(bombKey);
     }
@@ -240,20 +164,22 @@ export default class Player {
   }
 
   canPlaceBomb() {
-    return this.placedBombs.length + 1 <= this.maxBombs;
+    return this.placedBombs.size < this.maxBombs;
   }
 
   placeBomb(room) {
     if (this.isDead) return;
     if (
-      !this.canPlaceBomb() &&
+      !this.canPlaceBomb() ||
       Date.now() - this.lastTimePlaceBomb < this.timePlaceBomb
     ) {
       return;
     }
     this.lastTimePlaceBomb = Date.now();
-    const row = Math.floor((this.y + 20) / GAME_CONFIG.TILE_SIZE);
-    const col = Math.floor((this.x + 20) / GAME_CONFIG.TILE_SIZE);
+
+    // Place bomb at the center of the tile where the player currently is
+    const row = Math.floor(this.y + this.size / 2);
+    const col = Math.floor(this.x + this.size / 2);
 
     const frames = [
       { x: -5, y: 0 },
@@ -272,11 +198,12 @@ export default class Player {
     setTimeout(() => {
       this._removeBomb(row, col, room);
       this._destroyWall(row, col, frames, room);
-      this.placedBombs.delete(`${row}_${col}`);
     }, 3000);
   }
 
   _drawBomb(row, col, room) {
+    if (!this.canPlaceBomb()) return;
+    if (room.map[row][col] === 4) return;
     room.map[row][col] = 4;
     room.broadcast({
       type: SOCKET_TYPES.PUT_BOMB,
@@ -286,6 +213,7 @@ export default class Player {
 
   _removeBomb(row, col, room) {
     room.map[row][col] = 0;
+    this.placedBombs.delete(`${row}_${col}`);
     room.broadcast({
       type: SOCKET_TYPES.REMOVE_BOMB,
       position: { row, col },
@@ -350,6 +278,13 @@ export default class Player {
               index,
               frames,
             });
+          } else {
+            room.broadcast({
+              type: SOCKET_TYPES.WALL_DESTROY,
+              position: { row: newRow, col: newCol },
+              gift: false,
+              frames,
+            });
           }
           break;
         } else if (
@@ -363,10 +298,10 @@ export default class Player {
   }
 
   isPlayerHitByExplosion(data, room) {
-    const playerCenterX = this.x + this.width / 2;
-    const playerCenterY = this.y + this.height / 2;
-    const playerTileRow = Math.floor(playerCenterY / GAME_CONFIG.TILE_SIZE);
-    const playerTileCol = Math.floor(playerCenterX / GAME_CONFIG.TILE_SIZE);
+    const playerCenterX = this.x + this.size / 2;
+    const playerCenterY = this.y + this.size / 2;
+    const playerTileRow = Math.floor(playerCenterY);
+    const playerTileCol = Math.floor(playerCenterX);
 
     if (data.row === playerTileRow && data.col === playerTileCol) {
       this.loseLife();
@@ -409,10 +344,10 @@ export default class Player {
   }
 
   _checkpowerupCollection(room) {
-    const playerCenterX = this.x + this.width / 2;
-    const playerCenterY = this.y + this.height / 2;
-    const playerTileX = Math.floor(playerCenterX / GAME_CONFIG.TILE_SIZE);
-    const playerTileY = Math.floor(playerCenterY / GAME_CONFIG.TILE_SIZE);
+    const playerCenterX = this.x + this.size / 2;
+    const playerCenterY = this.y + this.size / 2;
+    const playerTileX = Math.floor(playerCenterX);
+    const playerTileY = Math.floor(playerCenterY);
 
     const powerupKey = `${playerTileY}_${playerTileX}`;
     if (room.powerups && room.powerups[powerupKey]) {
@@ -425,7 +360,6 @@ export default class Player {
         playerId: this.id,
         powerupType,
       });
-
       room.removepowerup(playerTileY, playerTileX);
     }
   }
@@ -433,13 +367,13 @@ export default class Player {
   collectpowerup(powerupType) {
     switch (powerupType) {
       case "bomb":
-        this.maxBombs++;
+        this.maxBombs = Math.min(this.maxBombs + 1, 5);
         break;
       case "speed":
-        this.speed += 10;
+        this.speed = Math.min(this.speed + 1, 16);
         break;
       case "fire":
-        this.fireRange++;
+        this.fireRange = Math.min(this.fireRange + 1, 5);
         break;
       default:
         logger.warn(`Unknown powerup type: ${powerupType}`);

@@ -19,3 +19,4 @@ export const SOCKET_TYPES = {
   powerup_COLLECTED: "powerupCollected",
   PLAYER_STATS: "playerStatsUpdate",
 };
+
