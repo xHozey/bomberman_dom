@@ -1,4 +1,4 @@
-import TileMap from "./tileMap.js";
+import TileMap from "./map.js";
 
 // export default function draw(canvas ){
 const tileSize = 32;

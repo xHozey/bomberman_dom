@@ -27,7 +27,6 @@ const server = http.createServer((req, res) => {
   fs.readFile(filePath, (err, data) => {
     if (err) {
       const indexPath = path.join(__dirname, "index.html");
-       
       fs.readFile(indexPath, (err, data) => {
         if (err) {
           res.writeHead(500);

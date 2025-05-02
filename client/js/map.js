@@ -1,6 +1,6 @@
 import { MyEventSystem } from "../src/event.js";
 import { createElement, jsx } from "../src/framework.js";
-import { socket } from "./index.js";
+import { socket } from "./socket.js";
 
 export const playersElement = new Map();
 export default class Game {
@@ -228,4 +228,8 @@ export default class Game {
     this.controlsInitialized = false;
     console.log("TileMap controls cleaned up");
   }
+}
+
+export{
+  Game
 }
