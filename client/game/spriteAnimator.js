@@ -8,7 +8,7 @@ const createSpriteAnimator = (config = {}) => {
         right: 1,
         left: 3,
         up: 2,
-        down: 0,
+        down: 4,
       },
     } = config;
   

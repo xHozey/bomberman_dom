@@ -276,18 +276,7 @@ const playerAnimator = createSpriteAnimator({
     right: 1,
     left: 3,
     up: 2,
-    down: 0,
-  },
-});
-
-const bombAnimator = createSpriteAnimator({
-  spriteWidth: 28,
-  spriteHeight: 40,
-  frameIndices: [0, 1, 2, 3],
-  frameSlow: 6,
-  directionRows: {
-    up: 0,
-    down: 1,
+    down: 4,
   },
 });
 
