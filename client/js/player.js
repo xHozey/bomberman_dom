@@ -3,7 +3,7 @@ import { jsx } from '../src/framework.js';
 import { Ref } from "./utils.js"
 import { updateRender } from "../src/vdom.js";
 import { playersElement } from "./map.js";
-import { createSpriteAnimator } from "./spriteanimator.js";
+import createSpriteAnimator from "./spriteanimator.js";
 
 // Game state variable
 export let gameState = {

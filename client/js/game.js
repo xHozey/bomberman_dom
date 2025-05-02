@@ -64,8 +64,20 @@ function startGame(data, tileMap) {
     }
   }, 1000);
 }
-let currentTileMap = null;
 
+function powerupCollected(data) {
+  const canvas = Ref.gameCanvasRef.current;
+  const tileElement = Selectbyrowcol(
+    canvas,
+    data.position.row,
+    data.position.col
+  );
+  if (tileElement) {
+    tileElement.innerHTML = "";
+  }
+}
+
+let currentTileMap = null;
 function GoToGame(data, tileMap) {
   if (currentTileMap) {
     currentTileMap.cleanup();
@@ -174,6 +186,7 @@ export {
   destroyWall,
   startGame,
   Selectbyrowcol,
-  broadcastPlayerInfo
+  broadcastPlayerInfo,
+  powerupCollected
 }
 ////////////////////////////////////////////////////////

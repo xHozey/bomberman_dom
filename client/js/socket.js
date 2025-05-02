@@ -3,14 +3,15 @@ import {
     removePlayer,
     updateOtherPlayerPosition,
     updatePlayerStats,
-    hearts
+    hearts,
+    animationPlayerDead
 } from "./player.js";
 import { gameState, Ref } from "./utils.js"
 // import {  } from "../src/router.js"
 import { notificationPower } from "./powerups.js"
 import { jsx } from "../src/framework.js";
 import { render } from "../src/vdom.js";
-import { startGame, destroyWall, broadcastPlayerInfo } from "./game.js";
+import { startGame, destroyWall, broadcastPlayerInfo, powerupCollected } from "./game.js";
 import { Game } from "./map.js"
 import { drawBomb, removeBomb, drawExplosion } from "./bombs.js"
 export let socket;
