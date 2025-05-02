@@ -30,5 +30,5 @@ export const getPosImg = (frameX, frameY, div) => {
   div.style.backgroundPosition = `${x}px ${y}px`;
 };
 
-playerElement.style.backgroundPositionY = data.position.spriteY + "px";
-playerElement.style.backgroundPositionX = data.position.spriteX + "px";
+// playerElement.style.backgroundPositionY = data.position.spriteY + "px";
+// playerElement.style.backgroundPositionX = data.position.spriteX + "px";
