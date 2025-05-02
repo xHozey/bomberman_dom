@@ -4,8 +4,8 @@ import { SOCKET_TYPES } from "../config/protocols.js";
 export default class Player {
   constructor(nickname, id, conn, room) {
     this.room = room;
-    this.x = 0; // World units (1 unit = 1 tile)
-    this.y = 0; // World units (1 unit = 1 tile)
+    this.x = 0;
+    this.y = 0;
     this.nickname = nickname;
     this.id = id;
     this.conn = conn;
@@ -16,12 +16,10 @@ export default class Player {
     this.isDead = false;
     this.direction = "up";
     this.movementStartTime = null;
-    this.timePlaceBomb = 3000;
-    this.lastTimePlaceBomb = 0;
     this.fireRange = 1;
     this.maxBombs = 1;
-    this.placedBombs = new Set();
-    this.collisionPadding = 0.1; // Collision padding in world units
+    this.placedBombCount = 0;
+    this.collisionPadding = 0.1;
   }
 
   loseLife() {
@@ -34,8 +32,8 @@ export default class Player {
 
   updateMove(data, room) {
     if (this.isDead) return;
-    const deltaTime = data.deltaTime || 0.016; // Seconds
-    const moveSpeed = this.speed * deltaTime; // World units per frame
+    const deltaTime = data.deltaTime || 0.016;
+    const moveSpeed = this.speed * deltaTime;
     const prevX = this.x;
     const prevY = this.y;
 
@@ -70,7 +68,6 @@ export default class Player {
       this.y = prevY;
     } else {
       this._checkpowerupCollection(room);
-      this._updateBombOverlap(room);
     }
 
     if (this.isMoving) {
@@ -89,13 +86,11 @@ export default class Player {
   }
 
   _checkCollision(room) {
-    // Get player bounds in world units
     const playerLeft = this.x + this.collisionPadding;
     const playerTop = this.y + this.collisionPadding;
     const playerRight = this.x + this.size - this.collisionPadding;
     const playerBottom = this.y + this.size - this.collisionPadding;
 
-    // Check surrounding tiles
     const minTileX = Math.floor(playerLeft);
     const maxTileX = Math.ceil(playerRight);
     const minTileY = Math.floor(playerTop);
@@ -110,7 +105,7 @@ export default class Player {
             tileType === 1 || // Wall
             tileType === 2 || // Tree
             tileType === 3 || // Breakable wall
-            (tileType === 4 && !this.placedBombs.has(`${y}_${x}`)) // Bomb not placed by this player
+            tileType === 4
           ) {
             if (
               playerRight > x &&
@@ -127,57 +122,11 @@ export default class Player {
     return false;
   }
 
-  _updateBombOverlap(room) {
-    const playerCenterX = this.x + this.size / 2;
-    const playerCenterY = this.y + this.size / 2;
-    const playerTileX = Math.floor(playerCenterX);
-    const playerTileY = Math.floor(playerCenterY);
-    const tileKey = `${playerTileY}_${playerTileX}`;
-
-    const toRemove = [];
-    for (const bombKey of this.placedBombs) {
-      const [bombRow, bombCol] = bombKey.split("_").map(Number);
-
-      // Check if player is outside the bomb tile
-      const outside =
-        this.x > bombCol + 1 ||
-        this.x + this.size < bombCol ||
-        this.y > bombRow + 1 ||
-        this.y + this.size < bombRow;
-
-      if (outside) toRemove.push(bombKey);
-    }
-
-    for (const key of toRemove) {
-      this.placedBombs.delete(key);
-    }
-
-    if (
-      playerTileY >= 0 &&
-      playerTileY < room.map.length &&
-      playerTileX >= 0 &&
-      playerTileX < room.map[0].length &&
-      room.map[playerTileY][playerTileX] === 4
-    ) {
-      this.placedBombs.add(tileKey);
-    }
-  }
-
-  canPlaceBomb() {
-    return this.placedBombs.size < this.maxBombs;
-  }
-
   placeBomb(room) {
-    if (this.isDead) return;
-    if (
-      !this.canPlaceBomb() ||
-      Date.now() - this.lastTimePlaceBomb < this.timePlaceBomb
-    ) {
+    if (this.isDead || this.placedBombCount >= this.maxBombs) {
       return;
     }
-    this.lastTimePlaceBomb = Date.now();
 
-    // Place bomb at the center of the tile where the player currently is
     const row = Math.floor(this.y + this.size / 2);
     const col = Math.floor(this.x + this.size / 2);
 
@@ -192,7 +141,7 @@ export default class Player {
       { x: -146, y: 36 },
     ];
 
-    this.placedBombs.add(`${row}_${col}`);
+    this.placedBombCount++;
     this._drawBomb(row, col, room);
 
     setTimeout(() => {
@@ -202,9 +151,10 @@ export default class Player {
   }
 
   _drawBomb(row, col, room) {
-    if (!this.canPlaceBomb()) return;
     if (room.map[row][col] === 4) return;
-    room.map[row][col] = 4;
+    setTimeout(() => {
+      room.map[row][col] = 4;
+    }, 600);
     room.broadcast({
       type: SOCKET_TYPES.PUT_BOMB,
       position: { row, col },
@@ -213,7 +163,7 @@ export default class Player {
 
   _removeBomb(row, col, room) {
     room.map[row][col] = 0;
-    this.placedBombs.delete(`${row}_${col}`);
+    this.placedBombCount--;
     room.broadcast({
       type: SOCKET_TYPES.REMOVE_BOMB,
       position: { row, col },

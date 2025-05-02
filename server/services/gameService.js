@@ -4,8 +4,6 @@ import { SOCKET_TYPES } from '../config/protocols.js';
 import { logger } from '../utils/logger.js';
 
 export default class GameService {
-  constructor() {
-  }
 
   startGame(room) {
     if (room.started) {
