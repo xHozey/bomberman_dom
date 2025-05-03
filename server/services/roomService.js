@@ -1,7 +1,7 @@
 import Room from "../models/room.js";
 import { GAME_CONFIG } from "../config/gameConfig.js";
 import { UUID } from "../utils/helpers.js";
-import { SOCKET_TYPES } from "../config/protocols.js";
+import { SOCKET_TYPES } from "../../client/js/protocols.js";
 
 export default class RoomService {
   constructor() {

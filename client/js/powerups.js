@@ -4,7 +4,6 @@ function notificationPower(data) {
     let notificationsEle = Ref.notificationsRef.current;
     if (!notificationsEle) return;
 
-    // let notification = jsx("div", { className: "power-notification"})
 
     if (data.bombPower) {
         notificationsEle.innerHTML = "💣 Bomb Power increased!";
@@ -20,7 +19,6 @@ function notificationPower(data) {
     }
 
     setTimeout(() => {
-        // notificationsEle.removeChild(elementToRemove);
         notificationsEle.innerHTML = "";
     }, 3000);
 }

@@ -1,5 +1,6 @@
 import { MyEventSystem } from "../src/event.js";
 import { createElement, jsx } from "../src/framework.js";
+import { SOCKET_TYPES } from "./protocols.js";
 import { socket } from "./socket.js";
 
 export const playersElement = new Map();
@@ -143,11 +144,11 @@ export default class Game {
       if (e.target.tagName == "INPUT" || e.target.tagName == "TEXTAREA") return;
       keysPressed[e.key] = true;
 
-      if ((e.key === "b" || e.key === "B") && !e.repeat) {
+      if ((e.key === " ") && !e.repeat) {
         if (socket && socket.readyState === WebSocket.OPEN) {
           socket.send(
             JSON.stringify({
-              type: "placeBomb",
+              type: SOCKET_TYPES.PLAYER_PLACE_BOMB,
             })
           );
         }
@@ -189,7 +190,7 @@ export default class Game {
         if (socket && socket.readyState === WebSocket.OPEN) {
           socket.send(
             JSON.stringify({
-              type: "playerMove",
+              type: SOCKET_TYPES.PLAYER_MOVE,
               direction: direction,
               deltaTime: deltaTime,
             })

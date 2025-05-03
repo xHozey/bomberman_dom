@@ -1,6 +1,6 @@
 import { safeStringify } from "../utils/helpers.js";
 import { logger } from "../utils/logger.js";
-import { SOCKET_TYPES } from "../config/protocols.js";
+import { SOCKET_TYPES } from "../../client/js/protocols.js";
 export default class Player {
   constructor(nickname, id, conn, room) {
     this.room = room;
@@ -19,7 +19,7 @@ export default class Player {
     this.fireRange = 1;
     this.maxBombs = 1;
     this.placedBombCount = 0;
-    this.collisionPadding = 0.1;
+    this.collisionPadding = 0.05;
   }
 
   loseLife() {
