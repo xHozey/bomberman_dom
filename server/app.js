@@ -14,7 +14,7 @@ const websocketService = new WebSocketService(server, roomService, gameService);
 
 websocketService.initialize();
 
-const PORT = 8080;
+const PORT = 8081;
 server.listen(PORT, () => {
   console.log(`Server is running at http://localhost:${PORT}`);
 });

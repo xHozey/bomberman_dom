@@ -629,7 +629,7 @@ font-family: 'Courier New', Courier, monospace;
     filter: brightness(1.2) drop-shadow(0 0 15px rgba(255, 200, 0, 0.8));
 }
 
-.game-container {
+/* .game-container {
     margin: 0 auto;
     height: 100%;
     display: flex;
@@ -637,9 +637,20 @@ font-family: 'Courier New', Courier, monospace;
     align-items: center;
     transform-origin: center center;
     transform: scale(0.85);
-    /* Scale down the container while preserving proportions */
     filter: drop-shadow(0 0 20px rgba(58, 123, 213, 0.3));
+} */
+
+.content-container {
+    display: flex;
+    flex-grow: 1;
+    height: calc(100vh - 60px);
+    /* Subtract header height */
+    align-items: stretch;
+    /* Make all children stretch to same height */
+    background: rgba(22, 40, 57, 0.4);
+    /* Add a consistent background */
 }
+
 
 .power-notification {
     padding: 10px;
