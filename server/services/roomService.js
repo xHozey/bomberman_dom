@@ -30,7 +30,7 @@ export default class RoomService {
         }, GAME_CONFIG.START_TIMEOUT);
         this.roomTimeouts.set(room.id, timeout);
         if (!room.countInterval) {
-          room.countP = GAME_CONFIG.START_TIMEOUT;
+          room.countP = 10;
           room.countInterval = setInterval(() => {
             room.broadcast({
               type: SOCKET_TYPES.PLAYER_UPDATE,

@@ -124,10 +124,11 @@ function updatePlayerCount(count, playerId, countP) {
         : "Game starting soon...";
   }
   if (waitingContainer) {
+    console.log(progressText);
     const updatedWaitingContent = jsx(
       "div",
-      {},
-      jsx("p", { id: "playercount" }, `Players: ${count}/4`),
+      { className: "here" },
+      jsx("p", { id: "playercount" }, `Players1: ${count}/4`),
       jsx(
         "div",
         { className: "waiting-animation" },

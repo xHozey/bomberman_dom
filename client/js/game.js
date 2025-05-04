@@ -26,13 +26,32 @@ export function waiting(element) {
         src: "/images/taytmzk.gif",
         alt: "Waiting...",
         style: "margin-top: 10px;",
-        className: "lmomzik"
+        className: "lmomzik",
       }),
       jsx("p", {}, "Looking for a match...")
+    ),
+    jsx(
+      "aside",
+      { className: "chat-sidebar" },
+      // Message Container
+      jsx("div", { className: "message-container", ref: Ref.messagesRef }),
+      // Chat Input Area
+      jsx(
+        "div",
+        { className: "chat-input-area" },
+        jsx("input", {
+          type: "text",
+          className: "chat-input",
+          placeholder: "Type a message...",
+          ref: Ref.chatRef,
+        }),
+        jsx("button", { className: "send-button", ref: Ref.buttonRef }, "Send")
+      )
     )
   );
 
-  render(waitingContent, element);
+  render(waitingContent, document.body);
+  chat(gameState.name);
 }
 
 function startGame(data, tileMap) {
@@ -50,8 +69,7 @@ function startGame(data, tileMap) {
           src: "/images/taytmzk.gif",
           alt: "Waiting...",
           style: "margin-top: 10px;",
-        className: "lmomzik"
-
+          className: "lmomzik",
         }),
         jsx("p", {}, "")
       )
@@ -149,8 +167,7 @@ function broadcastPlayerInfo(data) {
     return jsx(
       "li",
       { id: `${player.id}` },
-      `${player.nickname} - Lives: ${player.lives == 0 ? "dead" : player.lives
-      }`,
+      `${player.nickname} - Lives: ${player.lives == 0 ? "dead" : player.lives}`
     );
   });
   const showPlayersTitle = jsx("p", {}, "Players:");
@@ -162,8 +179,8 @@ function broadcastPlayerInfo(data) {
   );
 
   const wrapper = jsx("div", {}, showPlayersTitle, playerListContainer);
+  console.log(wrapper, playersElement);
   updateRender(wrapper, playersElement);
-
 }
 export {
   hasclass,
@@ -171,6 +188,5 @@ export {
   startGame,
   Selectbyrowcol,
   broadcastPlayerInfo,
-  powerupCollected
-}
-
+  powerupCollected,
+};
