@@ -132,11 +132,12 @@ function updatePlayerCount(count, playerId, countP) {
         "div",
         { className: "waiting-animation" },
         jsx("img", {
-          src: "/images/bomberman3d.gif",
+          src: "/images/taytmzk.gif",
           alt: "Waiting...",
           style: "margin-top: 10px;",
+          className: "lmomzik",
         }),
-        jsx("p", {}, progressText)
+        jsx("p", { class: "countPlayer" }, progressText)
       )
     );
 

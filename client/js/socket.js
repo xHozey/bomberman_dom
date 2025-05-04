@@ -121,7 +121,7 @@ function theWinnerIs(data) {
   const winScreen = jsx(
     "div",
     { id: "popup-msg", className: "popup", ref: Ref.popupRef },
-    jsx("h2", {}, `🎉 The winner is: ${data.name} 🎉`),
+    jsx("h2", {}, `${data.name} HAS WON!`),
     jsx(
       "button",
       {

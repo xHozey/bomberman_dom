@@ -2,7 +2,6 @@ import Room from "../models/room.js";
 import { GAME_CONFIG } from "../config/gameConfig.js";
 import { UUID } from "../utils/helpers.js";
 import { SOCKET_TYPES } from "../../client/js/protocols.js";
-import { logger } from "../utils/logger.js";
 
 export default class RoomService {
   constructor() {
@@ -31,7 +30,7 @@ export default class RoomService {
         }, GAME_CONFIG.START_TIMEOUT);
         this.roomTimeouts.set(room.id, timeout);
         if (!room.countInterval) {
-          room.countP = 20;
+          room.countP = GAME_CONFIG.START_TIMEOUT;
           room.countInterval = setInterval(() => {
             room.broadcast({
               type: SOCKET_TYPES.PLAYER_UPDATE,

@@ -23,9 +23,10 @@ export function waiting(element) {
       "div",
       { className: "waiting-animation" },
       jsx("img", {
-        src: "/images/bomberman3d.gif",
+        src: "/images/taytmzk.gif",
         alt: "Waiting...",
         style: "margin-top: 10px;",
+        className: "lmomzik"
       }),
       jsx("p", {}, "Looking for a match...")
     )
@@ -34,7 +35,6 @@ export function waiting(element) {
   render(waitingContent, element);
 }
 
-//game
 function startGame(data, tileMap) {
   let count = 10;
   const interval = setInterval(() => {
@@ -47,9 +47,11 @@ function startGame(data, tileMap) {
         "div",
         { className: "waiting-animation" },
         jsx("img", {
-          src: "/images/bomberman3d.gif",
+          src: "/images/taytmzk.gif",
           alt: "Waiting...",
           style: "margin-top: 10px;",
+        className: "lmomzik"
+
         }),
         jsx("p", {}, "")
       )

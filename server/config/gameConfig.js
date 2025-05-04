@@ -26,5 +26,5 @@ export const GAME_CONFIG = {
   ],
   TILE_SIZE: 40,
   MAX_PLAYERS: 4,
-  START_TIMEOUT: 20000,
+  START_TIMEOUT: 1000,
 };
