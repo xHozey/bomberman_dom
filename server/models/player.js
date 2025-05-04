@@ -19,7 +19,7 @@ export default class Player {
     this.fireRange = 1;
     this.maxBombs = 1;
     this.placedBombCount = 0;
-    this.collisionPadding = 0.05;
+    this.collisionPadding = 0.1;
   }
 
   loseLife() {
@@ -108,7 +108,7 @@ export default class Player {
               playerBottom > y &&
               playerTop < y + 1
             ) {
-              return true; 
+              return true;
             }
           }
         }

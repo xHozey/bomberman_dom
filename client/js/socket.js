@@ -7,7 +7,6 @@ import {
   animationPlayerDead,
 } from "./player.js";
 import { gameState, Ref } from "./utils.js";
-// import {  } from "../src/router.js"
 import { notificationPower } from "./powerups.js";
 import { jsx } from "../src/framework.js";
 import { render } from "../src/vdom.js";

@@ -36,8 +36,6 @@ export function waiting(element) {
 
 //game
 function startGame(data, tileMap) {
-  console.log(data.players);
-
   let count = 10;
   const interval = setInterval(() => {
     count--;
