@@ -1,4 +1,4 @@
-import { waitingContainer } from "./game.js";
+import { countRef, waitingContainer } from "./game.js";
 import { jsx } from "../src/framework.js";
 import { Ref } from "./utils.js";
 import { updateRender } from "../src/vdom.js";
@@ -123,27 +123,8 @@ function updatePlayerCount(count, playerId, countP) {
         ? `Game starting soon... ${countP}s`
         : "Game starting soon...";
   }
-  if (waitingContainer) {
-    console.log(progressText);
-    const updatedWaitingContent = jsx(
-      "div",
-      { className: "here" },
-      jsx("p", { id: "playercount" }, `Players1: ${count}/4`),
-      jsx(
-        "div",
-        { className: "waiting-animation" },
-        jsx("img", {
-          src: "/images/taytmzk.gif",
-          alt: "Waiting...",
-          style: "margin-top: 10px;",
-          className: "lmomzik",
-        }),
-        jsx("p", { class: "countPlayer" }, progressText)
-      )
-    );
-
-    updateRender(updatedWaitingContent, waitingContainer);
-  }
+  
+  countRef.current.textContent = `Players: ${count} ${progressText}`;
 }
 
 export {

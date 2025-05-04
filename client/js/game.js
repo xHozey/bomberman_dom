@@ -12,13 +12,18 @@ export const router = new Router({
 router.init();
 
 export let waitingContainer = null;
+export let countRef = { current: null };
 
 export function waiting(element) {
-  waitingContainer = element;
+  waitingContainer = document.body;
   const waitingContent = jsx(
     "div",
     {},
-    jsx("p", { id: "playercount" }, `Players: ${gameState.playerCount}/4`),
+    jsx(
+      "p",
+      { id: "playercount", ref: countRef },
+      `Players: ${gameState.playerCount}/4`
+    ),
     jsx(
       "div",
       { className: "waiting-animation" },
@@ -28,7 +33,7 @@ export function waiting(element) {
         style: "margin-top: 10px;",
         className: "lmomzik",
       }),
-      jsx("p", {class:"countPlayer"}, "Looking for a match...")
+      jsx("p", { class: "countPlayer" }, "Looking for a match...")
     ),
     jsx(
       "aside",
@@ -45,7 +50,11 @@ export function waiting(element) {
           placeholder: "Type a message...",
           ref: Ref.chatRef,
         }),
-        jsx("button", { className: "game-chat-send", ref: Ref.buttonRef }, "Send")
+        jsx(
+          "button",
+          { className: "game-chat-send", ref: Ref.buttonRef },
+          "Send"
+        )
       )
     )
   );
@@ -61,7 +70,7 @@ function startGame(data, tileMap) {
     const updatedWaitingContent = jsx(
       "div",
       {},
-      jsx("p", { id: "playercount" }, `start Game in : ${count}s`),
+      jsx("p", { id: "playercount", ref: countRef }, `start Game in : ${count}s`),
       jsx(
         "div",
         { className: "waiting-animation" },
