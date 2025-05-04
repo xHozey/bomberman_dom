@@ -28,24 +28,24 @@ export function waiting(element) {
         style: "margin-top: 10px;",
         className: "lmomzik",
       }),
-      jsx("p", {}, "Looking for a match...")
+      jsx("p", {class:"countPlayer"}, "Looking for a match...")
     ),
     jsx(
       "aside",
-      { className: "chat-sidebar" },
+      { className: "game-chat-sidebar" },
       // Message Container
-      jsx("div", { className: "message-container", ref: Ref.messagesRef }),
+      jsx("div", { className: "game-chat-messages", ref: Ref.messagesRef }),
       // Chat Input Area
       jsx(
         "div",
-        { className: "chat-input-area" },
+        { className: "game-chat-input-wrapper" },
         jsx("input", {
           type: "text",
-          className: "chat-input",
+          className: "game-chat-input",
           placeholder: "Type a message...",
           ref: Ref.chatRef,
         }),
-        jsx("button", { className: "send-button", ref: Ref.buttonRef }, "Send")
+        jsx("button", { className: "game-chat-send", ref: Ref.buttonRef }, "Send")
       )
     )
   );
