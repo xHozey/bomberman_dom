@@ -19,7 +19,7 @@ import {
 import { Game } from "./map.js";
 import { drawBomb, removeBomb, drawExplosion } from "./bombs.js";
 import { SOCKET_TYPES } from "./protocols.js";
-
+import { router } from "./game.js";
 
 export let socket;
 

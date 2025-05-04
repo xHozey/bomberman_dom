@@ -47,7 +47,7 @@ function hearts() {
 
 function animationPlayerDead(data) {
   let playerElement = playersElement.get(data.Id);
-  playerElement.style.backgroundImage = `url('../images/player_dead.png')`;
+  playerElement.style.backgroundImage = `url('../images/player_death.png')`;
 
   if (!playerElement) {
     console.log("player not found", data.Id);

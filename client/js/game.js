@@ -5,7 +5,7 @@ import { render, updateRender } from "../src/vdom.js";
 import { Router } from "../src/router.js";
 import { chat } from "./chat.js";
 
-const router = new Router({
+export const router = new Router({
   "/": () => [LoginPage()],
 });
 
@@ -102,15 +102,14 @@ function destroyWall(row, col, gift, index, frames) {
   if (tileElement) {
     if (gift) {
       const power = [
-        "../images/spoil_tileset.webp",
-        "../images/speed.webp",
-        "../images/bombing.webp",
+        "../images/maxBomb.png",
+        "../images/speed.png",
+        "../images/firerange.png",
       ];
       tileElement.innerHTML =
         '<img src="' +
         power[index] +
         '" style="width: 38px; height: 38px; position: absolute; top: 0; left: 0;">';
-      //gift = false;
     } else {
       tileElement.innerHTML = "";
       drawExplosion(row, col, frames);
@@ -118,7 +117,6 @@ function destroyWall(row, col, gift, index, frames) {
   }
 }
 
-// Helper function to check if a child has a .bomb div
 function hasclass(tile, className) {
   for (let i = 0; i < tile.children.length; i++) {
     if (tile.children[i].classList.contains(className)) {
@@ -131,8 +129,6 @@ function Selectbyrowcol(canvas, row, col) {
   let tileElement = null;
   for (let i = 0; i < canvas.children.length; i++) {
     const child = canvas.children[i];
-
-    // Make sure dataset exists and compare row/column
     if (
       child.dataset &&
       child.dataset.row === String(row) &&
@@ -146,12 +142,6 @@ function Selectbyrowcol(canvas, row, col) {
 }
 function broadcastPlayerInfo(data) {
   const playersElement = Ref.playersRef.current;
-  const images = [
-    "../images/bluecaracter.png",
-    "../images/redcaracter.png",
-    "../images/greencaracter.png",
-    "../images/yellowcaracter.png",
-  ];
 
   const playerList = data.players.map((player, index) => {
     return jsx(
@@ -159,11 +149,6 @@ function broadcastPlayerInfo(data) {
       { id: `${player.id}` },
       `${player.nickname} - Lives: ${player.lives == 0 ? "dead" : player.lives
       }`,
-      jsx("img", {
-        src: images[index],
-        alt: "player",
-        style: `width: 30px; height: 30px; margin-left: 10px;`,
-      })
     );
   });
   const showPlayersTitle = jsx("p", {}, "Players:");
@@ -177,7 +162,6 @@ function broadcastPlayerInfo(data) {
   const wrapper = jsx("div", {}, showPlayersTitle, playerListContainer);
   updateRender(wrapper, playersElement);
 
-  //   updateRender(playerList, playersElement);
 }
 export {
   hasclass,
@@ -187,4 +171,4 @@ export {
   broadcastPlayerInfo,
   powerupCollected
 }
-////////////////////////////////////////////////////////
+

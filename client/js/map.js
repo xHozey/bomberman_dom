@@ -8,7 +8,7 @@ export default class Game {
   constructor(tileSize, data) {
     this.tileSize = tileSize; // Pixel size of a tile for rendering
     this.players = data.players.length;
-    this.wall = this.#image("wallBlack.png");
+    this.wall = this.#image("solid-wall.png");
     this.bombs = [];
     this.MyId = data.MyId;
     this.map = data.map;
@@ -56,12 +56,12 @@ export default class Game {
             classname = "tile";
             break;
           case 1:
-            imgProps.src = "../images/wallBlack.png";
+            imgProps.src = "../images/solid-wall.png";
             divId = "wallfix";
             classname = "tile";
             break;
           case 2:
-            imgProps.src = "../images/wall.png";
+            imgProps.src = "../images/soft-wall.png";
             divId = "WallBreak";
             classname = "tile";
             break;
@@ -95,10 +95,10 @@ export default class Game {
         if (tile >= 5 && tile <= 8) {
           const playerIndex = tile - 5;
           const playerStyles = [
-            "url('../images/playerStyle.png')",
-            "url('../images/playerRed.png')",
-            "url('../images/playerGreen.png')",
-            "url('../images/playerYallow.png')",
+            "url('../images/p-blue.png')",
+            "url('../images/p-red.png')",
+            "url('../images/p-green.png')",
+            "url('../images/p-yellow.png')",
           ];
 
           // Convert world units to pixels
