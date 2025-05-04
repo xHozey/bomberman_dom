@@ -70,7 +70,11 @@ function startGame(data, tileMap) {
     const updatedWaitingContent = jsx(
       "div",
       {},
-      jsx("p", { id: "playercount", ref: countRef }, `start Game in : ${count}s`),
+      jsx(
+        "p",
+        { id: "playercount", ref: countRef },
+        `start Game in : ${count}s`
+      ),
       jsx(
         "div",
         { className: "waiting-animation" },
@@ -81,6 +85,28 @@ function startGame(data, tileMap) {
           className: "lmomzik",
         }),
         jsx("p", {}, "")
+      ),
+      jsx(
+        "aside",
+        { className: "game-chat-sidebar" },
+        // Message Container
+        jsx("div", { className: "game-chat-messages", ref: Ref.messagesRef }),
+        // Chat Input Area
+        jsx(
+          "div",
+          { className: "game-chat-input-wrapper" },
+          jsx("input", {
+            type: "text",
+            className: "game-chat-input",
+            placeholder: "Type a message...",
+            ref: Ref.chatRef,
+          }),
+          jsx(
+            "button",
+            { className: "game-chat-send", ref: Ref.buttonRef },
+            "Send"
+          )
+        )
       )
     );
 
