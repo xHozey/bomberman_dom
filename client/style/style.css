@@ -570,6 +570,7 @@ body::before {
     align-items: center;
     transform-origin: center center;
     filter: drop-shadow(0 0 20px rgba(58, 123, 213, 0.3));
+    transform: scale(0.9);
 }
 
 .power-notification {
@@ -601,24 +602,6 @@ body::before {
     }
 }
 
-/* .popup {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-
-    background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
-    color: #fff;
-    padding: 30px 50px;
-    border-radius: 12px;
-    box-shadow: 0 0 20px rgba(58, 123, 213, 0.3);
-
-    font-size: 24px;
-    font-weight: bold;
-    text-align: center;
-    border: 1px solid #3a7bd5;
-    z-index: 1000;
-} */
 .popup {
     position: fixed;
     top: 50%;
