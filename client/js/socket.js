@@ -20,6 +20,7 @@ import { Game } from "./map.js";
 import { drawBomb, removeBomb, drawExplosion } from "./bombs.js";
 import { SOCKET_TYPES } from "./protocols.js";
 import { router } from "./game.js";
+import { displayMsg } from "./chat.js";
 
 export let socket;
 
@@ -112,6 +113,7 @@ function handleServerMessages(data) {
       broadcastPlayerInfo(data);
       break;
     default:
+      console.log("message reiceved");
       break;
   }
 }
