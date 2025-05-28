@@ -1,11 +1,15 @@
-import { Div, Create, useRef } from "../../mostJS/index.js";
+import { Div, Create, useRef, P, useState } from "../../mostJS/index.js";
 import { powerUpTypes, SOCKET_TYPES, tileSize } from "../utils.js";
 
 const GameStart = ({ data, ws }) => {
+  const [gameEnd, setGameEnd] = useState(false);
   ws.onmessage = (e) => {
     const parsedData = JSON.parse(e.data);
     let tile;
     let player;
+    if (parsedData.type == SOCKET_TYPES.WINNER) {
+      setGameEnd(true);
+    }
     switch (parsedData.type) {
       case SOCKET_TYPES.PLAYER_MOVE:
         player = useRef(parsedData.nickname);
@@ -45,7 +49,7 @@ const GameStart = ({ data, ws }) => {
       case SOCKET_TYPES.COLLECT_POWERUP:
         tile = useRef(`${parsedData.position.row}_${parsedData.position.col}`);
         tile.style.backgroundColor = "beige";
-        break
+        break;
     }
   };
 
@@ -105,8 +109,11 @@ const GameStart = ({ data, ws }) => {
       })
     );
   });
-
-  return Div({}, [draw(data.map, data)]);
+  if (!gameEnd) {
+    return Div({}, [draw(data.map, data)]);
+  } else {
+    return P({}, "end");
+  }
 };
 
 const draw = (map, data) => {
@@ -124,26 +131,25 @@ const draw = (map, data) => {
       let ref = `${row}_${column}`;
 
       switch (tile) {
-        case 0: // Empty path
+        case 0:
           className = "tile path";
           blockColor = "beige";
           break;
-        case 1: // Solid wall
+        case 1:
           blockColor = "brown";
           break;
-        case 2: // Breakable wall
+        case 2:
           blockColor = "grey";
           break;
         case 5:
         case 6:
         case 7:
-        case 8: 
-          blockColor = "beige"
+        case 8:
+          blockColor = "beige";
           className = "tile spawn";
           break;
       }
 
-      // Create tile element
       const tileElement = Create("div", {
         className,
         reference: ref,
@@ -157,7 +163,6 @@ const draw = (map, data) => {
 
       tileElements.push(tileElement);
 
-      // Handle player elements (tiles 5-8)
       if (tile >= 5 && tile <= 8) {
         const playerIndex = tile - 5;
         const playerStyles = ["blue", "red", "green", "yellow"];
@@ -193,8 +198,6 @@ const draw = (map, data) => {
         display: "grid",
         gridTemplateRows: `repeat(${rows}, ${tileSize}px)`,
         gridTemplateColumns: `repeat(${columns}, ${tileSize}px)`,
-        // alignContent: "center",
-        // justifyContent: "center",
         position: "relative",
       },
     },

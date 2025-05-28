@@ -10,10 +10,9 @@ const ws = new WebSocket("ws://localhost:8080");
 const App = () => {
   const [screen, setScreen] = useState("game_menu");
   const [socket_data, setData] = useState(null);
-  
+
   ws.onmessage = (e) => {
     const data = JSON.parse(e.data);
-    console.log(data);
     switch (data.type) {
       // case SOCKET_TYPES.PLAYER_UPDATE:
       //   setScreen("game_lobby");
