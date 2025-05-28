@@ -1,10 +1,8 @@
-import GameMap from '../models/gameMap.js';
-import { safeStringify } from '../utils/helpers.js';
-import { SOCKET_TYPES } from "../config/protocols.js"
-import { logger } from '../utils/logger.js';
+import GameMap from "../models/gameMap.js";
+import { SOCKET_TYPES } from "../../client/src/utils.js";
+import { logger } from "../utils/logger.js";
 
 export default class GameService {
-
   startGame(room) {
     if (room.started) {
       logger.info(`Room ${room.id} already started`);
@@ -16,19 +14,19 @@ export default class GameService {
 
     const gameMap = new GameMap();
     const playersArray = Array.from(room.players.values());
-
     gameMap.initializePlayers(playersArray);
     room.setMapData(gameMap.map, gameMap.tileSize);
-
+    const playerData = playersArray.map(player => player.getNetworkData());
     for (const player of playersArray) {
-      player.conn.send(safeStringify({
-        type: SOCKET_TYPES.GAME_START,
-        nickname: player.nickname,
-        lives: player.lives,
-        players: playersArray,
-        MyId: player.id,
-        map: gameMap.map,
-      }));
+      player.conn.send(
+        JSON.stringify({
+          type: SOCKET_TYPES.GAME_START,
+          lives: player.lives,
+          players: playerData,
+          nickname: player.nickname,
+          map: gameMap.map,
+        })
+      );
     }
   }
 }

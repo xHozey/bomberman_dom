@@ -1,14 +1,13 @@
 import { safeStringify } from "../utils/helpers.js";
 import { logger } from "../utils/logger.js";
-import { SOCKET_TYPES } from "../config/protocols.js"
+import { SOCKET_TYPES } from "../../client/src/utils.js";
 
 export default class Player {
-  constructor(nickname, id, conn, room) {
+  constructor(nickname, conn, room) {
     this.room = room;
     this.x = 0;
     this.y = 0;
     this.nickname = nickname;
-    this.id = id;
     this.conn = conn;
     this.size = 1;
     this.lives = 3;
@@ -21,6 +20,24 @@ export default class Player {
     this.maxBombs = 1;
     this.placedBombCount = 0;
     this.collisionPadding = 0.1;
+  }
+
+  getNetworkData() {
+    return {
+      id: this.id,
+      nickname: this.nickname,
+      lives: this.lives,
+      x: this.x,
+      y: this.y,
+      size: this.size,
+      speed: this.speed,
+      isMoving: this.isMoving,
+      isDead: this.isDead,
+      direction: this.direction,
+      fireRange: this.fireRange,
+      maxBombs: this.maxBombs,
+      placedBombCount: this.placedBombCount
+    };
   }
 
   loseLife() {
@@ -79,7 +96,7 @@ export default class Player {
           y: this.y,
         },
         direction: this.direction,
-        Id: this.id,
+        nickname: this.nickname,
       };
 
       room.broadcast(moveData);
@@ -254,7 +271,7 @@ export default class Player {
       this.conn.send(
         safeStringify({
           type: SOCKET_TYPES.PLAYER_LIVES,
-          Id: this.id,
+          nickname: this.nickname,
           hearts: this.lives,
         })
       );
@@ -269,7 +286,7 @@ export default class Player {
       if (this.isDead) {
         room.broadcast({
           type: SOCKET_TYPES.PLAYER_DEATH,
-          Id: this.id,
+          nickname: this.nickname,
         });
       }
     }
@@ -303,7 +320,7 @@ export default class Player {
       room.broadcast({
         type: SOCKET_TYPES.COLLECT_POWERUP,
         position: { row: playerTileY, col: playerTileX },
-        playerId: this.id,
+        nickname: this.nickname,
         powerupType,
       });
       room.removepowerup(playerTileY, playerTileX);

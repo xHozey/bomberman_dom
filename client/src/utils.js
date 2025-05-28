@@ -19,4 +19,4 @@ export const SOCKET_TYPES = {
     powerup_COLLECTED: "powerup_collect",
     PLAYER_STATS: "player_stats",
   };
-  
+export const tileSize = 40

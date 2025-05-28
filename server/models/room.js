@@ -1,5 +1,5 @@
 import { safeStringify } from "../utils/helpers.js";
-import { SOCKET_TYPES } from "../config/protocols.js"
+import { SOCKET_TYPES } from "../../client/src/utils.js";
 
 
 export default class Room {
@@ -15,16 +15,16 @@ export default class Room {
   }
 
   addPlayer(player) {
-    this.players.set(player.id, player);
+    this.players.set(player.nickname, player);
   }
 
-  removePlayer(playerId) {
-    this.players.delete(playerId);
+  removePlayer(nickname) {
+    this.players.delete(nickname);
     if (this.started) {
       const playersArray = Array.from(this.players.values());
       this.broadcast({
         type: SOCKET_TYPES.PLAYER_REMOVE,
-        id: playerId,
+        nickname: nickname,
         players: playersArray,
       });
       if (this.players.size === 1) {

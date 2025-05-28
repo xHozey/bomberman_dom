@@ -1,7 +1,7 @@
-import { P } from "../../mostJS/index.js";
+import { Div, P, Span, useState } from "../../mostJS/index.js";
 
 const GameLobby = ({ data }) => {
-  return P({}, "Hello World");
+  return P({}, "WAIT");
 };
 
 export default GameLobby;
