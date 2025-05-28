@@ -1,13 +1,17 @@
-import { Div, Create, useRef, P, useState } from "../../mostJS/index.js";
+import { Div, Create, useRef, P, useState, Component } from "../../mostJS/index.js";
 import { powerUpTypes, SOCKET_TYPES, tileSize } from "../utils.js";
+import  GameEnd  from "./game_end.js"
+
 
 const GameStart = ({ data, ws }) => {
   const [gameEnd, setGameEnd] = useState(false);
+  const [winner, setWinner] = useState('')
   ws.onmessage = (e) => {
     const parsedData = JSON.parse(e.data);
     let tile;
     let player;
     if (parsedData.type == SOCKET_TYPES.WINNER) {
+      setWinner(parsedData.nickname)
       setGameEnd(true);
     }
     switch (parsedData.type) {
@@ -112,7 +116,7 @@ const GameStart = ({ data, ws }) => {
   if (!gameEnd) {
     return Div({}, [draw(data.map, data)]);
   } else {
-    return P({}, "end");
+    return Component(GameEnd, { winner }, "game_end");
   }
 };
 

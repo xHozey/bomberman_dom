@@ -1,8 +1,9 @@
-import { Div, Span } from "../../mostJS/index.js";
+import { Div, Span, Button } from "../../mostJS/index.js";
+
 
 const GameEnd = ({ data }) => {
   return Div({}, [
-    Span({}, data.nickname),
+    Span({}, data || "Unknown Winner"),
     Button(
       {
         onclick: () => {

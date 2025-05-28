@@ -53,7 +53,7 @@ export default class Player {
       this.immune = true;
       setTimeout(() => {
         this.immune = false;
-      }, 1500);
+      }, 500);
     }
   }
 
