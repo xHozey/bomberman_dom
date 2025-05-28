@@ -1,6 +1,6 @@
 import GameMap from '../models/gameMap.js';
 import { safeStringify } from '../utils/helpers.js';
-import { SOCKET_TYPES } from '../../client/js/protocols.js';
+import { SOCKET_TYPES } from "../config/protocols.js"
 import { logger } from '../utils/logger.js';
 
 export default class GameService {

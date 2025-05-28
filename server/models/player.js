@@ -1,6 +1,7 @@
 import { safeStringify } from "../utils/helpers.js";
 import { logger } from "../utils/logger.js";
-import { SOCKET_TYPES } from "../../client/js/protocols.js";
+import { SOCKET_TYPES } from "../config/protocols.js"
+
 export default class Player {
   constructor(nickname, id, conn, room) {
     this.room = room;

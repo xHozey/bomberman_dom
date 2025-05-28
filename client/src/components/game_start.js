@@ -1,4 +1,5 @@
 import { Button, Div, Input, P, useState } from "../../mostJS/index.js";
+import { SOCKET_TYPES } from "../utils.js";
 
 const GameStart = ({ socket }) => {
   const [name, setName] = useState("");

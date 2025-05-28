@@ -1,19 +1,30 @@
 import { Component, render, useState } from "../mostJS/index.js";
+import GameLobby from "./components/game_lobby.js";
 import GameStart from "./components/game_start.js";
+import { SOCKET_TYPES } from "./utils.js";
 
 const ws = new WebSocket("ws://localhost:8080");
 
 const App = () => {
   const [screen, setScreen] = useState("game_start");
+  const [socket_data, setData] = useState(null)
+  const [messages, setMessages] = useState([])
   ws.onmessage = (e) => {
-    const data = JSON.parse(e.data)
+    const data = JSON.parse(e.data);
     switch (data.type) {
-      
+      case SOCKET_TYPES.PLAYER_UPDATE:
+        setScreen("game_lobby");
+        setData(data)
+        break;
     }
-  }
+  };
+
   switch (screen) {
     case "game_start":
-      Component(GameStart, {socket: ws}, "game_start");
+      return Component(GameStart, { socket: ws }, "game_start");
+    case "game_lobby":
+      return Component(GameLobby, {data: socket_data}, "game_lobby");
+    case "game_start":
       break;
   }
 };
