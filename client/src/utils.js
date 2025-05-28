@@ -22,4 +22,6 @@ export const SOCKET_TYPES = {
   powerup_COLLECTED: "powerup_collect",
   PLAYER_STATS: "player_stats",
 };
+export const powerUpTypes = ["purple", "cyan", "crimson"];
+
 export const tileSize = 40;

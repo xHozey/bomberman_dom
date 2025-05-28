@@ -287,7 +287,7 @@ export default class Player {
 
     if (room.map[playerTileRow][playerTileCol] == 99) {
       this.loseLife();
-      
+
       this.conn.send(
         safeStringify({
           type: SOCKET_TYPES.PLAYER_LIVES,
@@ -319,7 +319,7 @@ export default class Player {
       room.started = false;
       room.broadcast({
         type: SOCKET_TYPES.WINNER,
-        name: alivePlayers[0][1].nickname,
+        nickname: alivePlayers[0][1].nickname,
       });
     } else if (alivePlayers.length === 0) {
       logger.info(`room: ${this.room} Draw!`);

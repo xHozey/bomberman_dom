@@ -1,5 +1,5 @@
 import { Div, Create, useRef } from "../../mostJS/index.js";
-import { SOCKET_TYPES, tileSize } from "../utils.js";
+import { powerUpTypes, SOCKET_TYPES, tileSize } from "../utils.js";
 
 const GameStart = ({ data, ws }) => {
   ws.onmessage = (e) => {
@@ -28,12 +28,24 @@ const GameStart = ({ data, ws }) => {
       case SOCKET_TYPES.CLEAR_EXPLOSION:
       case SOCKET_TYPES.WALL_DESTROY:
         tile = useRef(`${parsedData.position.row}_${parsedData.position.col}`);
-        tile.style.backgroundColor = "beige";
+        if (
+          parsedData.index &&
+          parsedData.index >= 0 &&
+          parsedData.index <= 2
+        ) {
+          tile.style.backgroundColor = powerUpTypes[parsedData.index];
+        } else {
+          tile.style.backgroundColor = "beige";
+        }
         break;
       case SOCKET_TYPES.PLAYER_DEATH:
         player = useRef(parsedData.nickname);
         player.remove();
         break;
+      case SOCKET_TYPES.COLLECT_POWERUP:
+        tile = useRef(`${parsedData.position.row}_${parsedData.position.col}`);
+        tile.style.backgroundColor = "beige";
+        break
     }
   };
 
