@@ -1,6 +1,6 @@
 import { Button, Div, Input, P, useState } from "../../mostJS/index.js";
 
-const GameStart = () => {
+const GameStart = ({ socket }) => {
   const [name, setName] = useState("");
 
   return Div({}, [
@@ -13,7 +13,7 @@ const GameStart = () => {
     Button(
       {
         onClick: () => {
-          ws.socket(
+          socket.send(
             JSON.stringify({
               type: SOCKET_TYPES.PLAYER_JOIN,
               nickname: name,
