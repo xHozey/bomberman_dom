@@ -8,7 +8,7 @@ class GameLoop {
     this.id = setInterval(() => {
       this.room.players.forEach((player) => {
         player.updateMove(1 / 30, this.room);
-        player.isPlayerHitByExplosion(this.room);
+        player.playerDamage(this.room);
       });
     }, 1000 / 30);
   }

@@ -12,13 +12,12 @@ export default class Player {
     this.size = 1;
     this.lives = 3;
     this.speed = 6;
+    this.immune = false;
     this.UP = false;
     this.DOWN = false;
-    1;
     this.RIGHT = false;
     this.LEFT = false;
     this.isDead = false;
-    this.direction = "up";
     this.movementStartTime = null;
     this.fireRange = 1;
     this.maxBombs = 1;
@@ -46,11 +45,18 @@ export default class Player {
 
   loseLife() {
     if (this.isDead) return;
-    this.lives -= 1;
-    if (this.lives == 0) {
-      this.isDead = true;
+    if (!this.immune) {
+      this.lives -= 1;
+      if (this.lives == 0) {
+        this.isDead = true;
+      }
+      this.immune = true;
+      setTimeout(() => {
+        this.immune = false;
+      }, 1500);
     }
   }
+
   startMove(direction) {
     switch (direction) {
       case "up":
@@ -67,6 +73,7 @@ export default class Player {
         break;
     }
   }
+
   stopMove(direction) {
     switch (direction) {
       case "up":
@@ -272,7 +279,7 @@ export default class Player {
     });
   }
 
-  isPlayerHitByExplosion(room) {
+  playerDamage(room) {
     const playerCenterX = this.x + this.size / 2;
     const playerCenterY = this.y + this.size / 2;
     const playerTileRow = Math.floor(playerCenterY);
@@ -280,6 +287,7 @@ export default class Player {
 
     if (room.map[playerTileRow][playerTileCol] == 99) {
       this.loseLife();
+      
       this.conn.send(
         safeStringify({
           type: SOCKET_TYPES.PLAYER_LIVES,

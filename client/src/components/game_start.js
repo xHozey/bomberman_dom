@@ -5,9 +5,10 @@ const GameStart = ({ data, ws }) => {
   ws.onmessage = (e) => {
     const parsedData = JSON.parse(e.data);
     let tile;
+    let player;
     switch (parsedData.type) {
       case SOCKET_TYPES.PLAYER_MOVE:
-        const player = useRef(parsedData.nickname);
+        player = useRef(parsedData.nickname);
         player.style.transform = `translate(${
           parsedData.position.x * tileSize
         }px, ${parsedData.position.y * tileSize}px)`;
@@ -28,6 +29,10 @@ const GameStart = ({ data, ws }) => {
       case SOCKET_TYPES.WALL_DESTROY:
         tile = useRef(`${parsedData.position.row}_${parsedData.position.col}`);
         tile.style.backgroundColor = "beige";
+        break;
+      case SOCKET_TYPES.PLAYER_DEATH:
+        player = useRef(parsedData.nickname);
+        player.remove();
         break;
     }
   };
@@ -173,6 +178,7 @@ const draw = (map, data) => {
   return Create(
     "div",
     {
+      reference: "map",
       style: {
         display: "grid",
         gridTemplateRows: `repeat(${rows}, ${tileSize}px)`,
