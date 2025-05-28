@@ -1,33 +1,17 @@
-import { Button, Div, Input, P, render, useState } from "../mostJS/index.js";
-import { SOCKET_TYPES } from "./utils.js";
+import { Component, render, useState } from "../mostJS/index.js";
+import GameStart from "./components/game_start.js";
 import SocketServer from "./websocket.js";
 
 const ws = new SocketServer("ws://localhost:8080");
 
 const App = () => {
-  const [name, setName] = useState("");
-  
-  return Div({}, [
-    P({}, "Enter your name"),
-    Input({
-      oninput: (e) => {
-        setName(e.target.value);
-      },
-    }),
-    Button(
-      {
-        onClick: () => {
-          ws.socket(
-            JSON.stringify({
-              type: SOCKET_TYPES.PLAYER_JOIN,
-              nickname: name,
-            })
-          );
-        },
-      },
-      ["Start"]
-    ),
-  ]);
+  const [screen, setScreen] = useState("game_start");
+
+  switch (screen) {
+    case "game_start":
+      Component(GameStart, {}, "game_start");
+      break;
+  }
 };
 
 render("app", App, {});
