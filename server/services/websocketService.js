@@ -1,6 +1,6 @@
 import { WebSocketServer } from "ws";
 import Player from "../models/player.js";
-import { SOCKET_TYPES } from "../config/protocols.js";
+import { SOCKET_TYPES } from "../../client/js/protocols.js";
 import { logger } from "../utils/logger.js";
 
 export default class WebSocketService {
@@ -56,6 +56,7 @@ export default class WebSocketService {
             break;
 
           case SOCKET_TYPES.PLAYER_CHAT:
+            console.log(currentPlayer);
             if (currentRoom) {
               currentRoom.broadcast({
                 type: SOCKET_TYPES.PLAYER_CHAT,
