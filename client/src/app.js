@@ -13,7 +13,7 @@ const App = () => {
   
   ws.onmessage = (e) => {
     const data = JSON.parse(e.data);
-    console.log(data.type);
+    console.log(data);
     switch (data.type) {
       // case SOCKET_TYPES.PLAYER_UPDATE:
       //   setScreen("game_lobby");

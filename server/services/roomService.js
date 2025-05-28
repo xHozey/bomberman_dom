@@ -3,13 +3,10 @@ import { GAME_CONFIG } from "../config/gameConfig.js";
 import { UUID } from "../utils/helpers.js";
 import { SOCKET_TYPES } from "../../client/src/utils.js";
 
-
-
 export default class RoomService {
   constructor() {
     this.rooms = new Map();
     this.roomTimeouts = new Map();
-
   }
 
   findAvailableRoom() {
@@ -23,38 +20,76 @@ export default class RoomService {
     return room;
   }
 
-  scheduleGameStart(room, gameService) {
+  scheduleGameWaiting(room, gameService) {
     if (room.players.size >= 2 && room.players.size <= 3 && !room.started) {
-      if (!this.roomTimeouts.has(room.id)) {
+      if (
+        !this.roomTimeouts.has(`${room.id}_waiting
+        `)
+      ) {
         const timeout = setTimeout(() => {
-          gameService.startGame(room);
-          this.roomTimeouts.delete(room.id);
-        }, GAME_CONFIG.START_TIMEOUT);
-        this.roomTimeouts.set(room.id, timeout);
-        if (!room.countInterval) {
-          room.countP = 3;
-          room.countInterval = setInterval(() => {
+          this.scheduleGameStart(room, gameService);
+        }, GAME_CONFIG.WAITING_TIMEOUT);
+        this.roomTimeouts.set(
+          `${room.id}_waiting
+            `,
+          timeout
+        );
+        if (!room.countInterval[1]) {
+          room.WaitCount = GAME_CONFIG.WAITING_TIMEOUT / 1000;
+          room.countInterval[1] = setInterval(() => {
             room.broadcast({
               type: SOCKET_TYPES.PLAYER_UPDATE,
               playerCount: room.players.size,
-              countP: room.countP,
+              wait: room.WaitCount,
             });
-            room.countP--;
-            if (room.countP <= 0) {
-              clearInterval(room.countInterval);
-              room.countInterval = null;
+            room.WaitCount--;
+            if (room.WaitCount <= 0) {
+              clearInterval(room.countInterval[1]);
+              room.countInterval[1] = null;
             }
           }, 1000);
         }
       }
-    } else if (room.players.size === GAME_CONFIG.MAX_PLAYERS && !room.started) {
-      if (this.roomTimeouts.has(room.id)) {
-        clearTimeout(this.roomTimeouts.get(room.id));
-        this.roomTimeouts.delete(room.id);
+    } else if (room.players.size == GAME_CONFIG.MAX_PLAYERS && !room.started) {
+      if (
+        this.roomTimeouts.has(`${room.id}_waiting
+        `)
+      ) {
+        clearTimeout(
+          this.roomTimeouts.get(`${room.id}_waiting
+        `)
+        );
+        this.roomTimeouts.delete(`${room.id}_waiting
+        `);
       }
       clearInterval(room.countInterval);
       room.countInterval = null;
-      gameService.startGame(room);
+      this.scheduleGameStart(room, gameService);
+    }
+  }
+
+  scheduleGameStart(room, gameService) {
+    if (!this.roomTimeouts.has(`${room.id}_starting`)) {
+      const timeout = setTimeout(() => {
+        gameService.startGame(room);
+        this.roomTimeouts.delete(`${room.id}_starting`);
+      }, GAME_CONFIG.START_TIMEOUT);
+      this.roomTimeouts.set(`${room.id}_starting`, timeout);
+      if (!room.countInterval[0]) {
+        room.StartCount = GAME_CONFIG.START_TIMEOUT / 1000;
+        room.countInterval[0] = setInterval(() => {
+          room.broadcast({
+            type: SOCKET_TYPES.PLAYER_UPDATE,
+            playerCount: room.players.size,
+            start: room.StartCount,
+          });
+          room.StartCount--;
+          if (room.StartCount <= 0) {
+            clearInterval(room.countInterval[0]);
+            room.countInterval[0] = null;
+          }
+        }, 1000);
+      }
     }
   }
 }

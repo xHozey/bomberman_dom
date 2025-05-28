@@ -37,7 +37,7 @@ export default class WebSocketService {
               logger.info(
                 `Player ${data.nickname} joined Room ${currentRoom.id}`
               );
-              this.roomService.scheduleGameStart(currentRoom, this.gameService);
+              this.roomService.scheduleGameWaiting(currentRoom, this.gameService);
               break;
 
             case SOCKET_TYPES.PLAYER_START_MOVE:

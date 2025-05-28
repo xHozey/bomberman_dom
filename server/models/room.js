@@ -7,8 +7,9 @@ export default class Room {
     this.players = new Map();
     this.started = false;
     this.powerups = {};
-    this.countInterval = null;
-    this.countP = null;
+    this.countInterval = [null, null];
+    this.StartCount = null;
+    this.WaitCount = null;
     this.map = null;
     this.tileSize = null;
   }
