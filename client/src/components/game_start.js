@@ -5,7 +5,6 @@ const GameStart = ({ data, ws }) => {
   ws.onmessage = (e) => {
     const parsedData = JSON.parse(e.data);
     let tile;
-    console.log(parsedData);
     switch (parsedData.type) {
       case SOCKET_TYPES.PLAYER_MOVE:
         const player = useRef(parsedData.nickname);
@@ -15,7 +14,6 @@ const GameStart = ({ data, ws }) => {
         break;
       case SOCKET_TYPES.PUT_BOMB:
         tile = useRef(`${parsedData.position.row}_${parsedData.position.col}`);
-        console.log(tile);
         tile.style.backgroundColor = "black";
         break;
       case SOCKET_TYPES.REMOVE_BOMB:
@@ -24,14 +22,13 @@ const GameStart = ({ data, ws }) => {
         break;
       case SOCKET_TYPES.EXPLOSION:
         tile = useRef(`${parsedData.position.row}_${parsedData.position.col}`);
-        if (tile.style.backgroundColor == "grey") {
-          tile.style.backgroundColor = "orange";
-        }
+        tile.style.backgroundColor = "orange";
         break;
-        case SOCKET_TYPES.WALL_DESTROY:
-            if (tile.style.backgroundColor == "grey") {
-          tile.style.backgroundColor = "orange";
-        }
+      case SOCKET_TYPES.CLEAR_EXPLOSION:
+      case SOCKET_TYPES.WALL_DESTROY:
+        tile = useRef(`${parsedData.position.row}_${parsedData.position.col}`);
+        tile.style.backgroundColor = "beige";
+        break;
     }
   };
 
@@ -159,8 +156,8 @@ const draw = (map, data) => {
           id: `player_${data.players[playerIndex].id}`,
           style: {
             backgroundColor: playerStyles[playerIndex],
-            width: `${Math.floor(tileSize * 0.8)}px`,
-            height: `${Math.floor(tileSize * 0.8)}px`,
+            width: `${Math.floor(tileSize)}px`,
+            height: `${Math.floor(tileSize)}px`,
             position: "absolute",
             zIndex: 10,
             transform: `translate(${playerX}px, ${playerY}px)`,
@@ -190,77 +187,3 @@ const draw = (map, data) => {
 };
 
 export default GameStart;
-
-//  _destroyWall(row, col, room) {
-//     room.broadcast({
-//       type: SOCKET_TYPES.EXPLOSION,
-//       position: { row, col },
-//     });
-
-//     room.broadcast({
-//       type: SOCKET_TYPES.PLAYER_HIT_BY_EXPLOSION,
-//       row,
-//       col,
-//     });
-
-//     const baseDirections = [
-//       { dr: -1, dc: 0 },
-//       { dr: 1, dc: 0 },
-//       { dr: 0, dc: -1 },
-//       { dr: 0, dc: 1 },
-//     ];
-
-//     baseDirections.forEach(({ dr, dc }) => {
-//       for (let i = 1; i <= this.fireRange; i++) {
-//         const newRow = row + dr * i;
-//         const newCol = col + dc * i;
-
-//         if (
-//           newRow < 0 ||
-//           newRow >= room.map.length ||
-//           newCol < 0 ||
-//           newCol >= room.map[0].length
-//         ) {
-//           break;
-//         }
-
-//         room.broadcast({
-//           type: SOCKET_TYPES.EXPLOSION,
-//           position: { row: newRow, col: newCol },
-//           frames,
-//         });
-
-//         room.broadcast({
-//           type: SOCKET_TYPES.PLAYER_HIT_BY_EXPLOSION,
-//           row: newRow,
-//           col: newCol,
-//         });
-
-//         if (room.map[newRow][newCol] === 2) {
-//           room.map[newRow][newCol] = 0;
-//           if (Math.random() < 0.3) {
-//             const index = Math.floor(Math.random() * 3);
-//             room.addpowerup(newRow, newCol, index);
-//             room.broadcast({
-//               type: SOCKET_TYPES.WALL_DESTROY,
-//               position: { row: newRow, col: newCol },
-//               gift: true,
-//               index,
-//             });
-//           } else {
-//             room.broadcast({
-//               type: SOCKET_TYPES.WALL_DESTROY,
-//               position: { row: newRow, col: newCol },
-//               gift: false,
-//             });
-//           }
-//           break;
-//         } else if (
-//           room.map[newRow][newCol] !== 0 &&
-//           room.map[newRow][newCol] < 5
-//         ) {
-//           break;
-//         }
-//       }
-//     });
-//   }

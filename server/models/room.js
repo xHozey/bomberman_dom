@@ -17,7 +17,7 @@ export default class Room {
     this.players.set(player.nickname, player);
   }
 
-  removePlayer(nickname) {
+  removePlayer(nickname, gameService) {
     this.players.delete(nickname);
     if (this.started) {
       const playersArray = Array.from(this.players.values());

@@ -14,6 +14,7 @@ export default class Player {
     this.speed = 6;
     this.UP = false;
     this.DOWN = false;
+    1;
     this.RIGHT = false;
     this.LEFT = false;
     this.isDead = false;
@@ -198,6 +199,14 @@ export default class Player {
       type: SOCKET_TYPES.EXPLOSION,
       position: { row, col },
     });
+    room.map[row][col] = 99;
+    setTimeout(() => {
+      room.broadcast({
+        type: SOCKET_TYPES.CLEAR_EXPLOSION,
+        position: { row, col },
+      });
+      room.map[row][col] = 0;
+    }, 3000);
 
     const baseDirections = [
       { dr: -1, dc: 0 },
@@ -215,33 +224,28 @@ export default class Player {
           newRow < 0 ||
           newRow >= room.map.length ||
           newCol < 0 ||
-          newCol >= room.map[0].length
+          newCol >= room.map[0].length ||
+          room.map[newRow][newCol] == 1
         ) {
           break;
         }
 
-        room.broadcast({
-          type: SOCKET_TYPES.EXPLOSION,
-          position: { row: newRow, col: newCol },
-        });
-        room.map[newRow][newCol] = 99;
-
         if (room.map[newRow][newCol] === 2) {
           room.map[newRow][newCol] = 0;
+
           if (Math.random() < 0.3) {
             const index = Math.floor(Math.random() * 3);
             room.addpowerup(newRow, newCol, index);
             room.broadcast({
               type: SOCKET_TYPES.WALL_DESTROY,
               position: { row: newRow, col: newCol },
-              gift: true,
               index,
             });
           } else {
             room.broadcast({
               type: SOCKET_TYPES.WALL_DESTROY,
               position: { row: newRow, col: newCol },
-              gift: false,
+              index: 9,
             });
           }
           break;
@@ -250,6 +254,19 @@ export default class Player {
           room.map[newRow][newCol] < 5
         ) {
           break;
+        } else {
+          room.broadcast({
+            type: SOCKET_TYPES.EXPLOSION,
+            position: { row: newRow, col: newCol },
+          });
+          room.map[newRow][newCol] = 99;
+          setTimeout(() => {
+            room.map[newRow][newCol] = 0;
+            room.broadcast({
+              type: SOCKET_TYPES.CLEAR_EXPLOSION,
+              position: { row: newRow, col: newCol },
+            });
+          }, 3000);
         }
       }
     });

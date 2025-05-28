@@ -53,11 +53,6 @@ export default class WebSocketService {
             case SOCKET_TYPES.PLAYER_PLACE_BOMB:
               if (currentPlayer) currentPlayer.placeBomb(currentRoom);
               break;
-            // case SOCKET_TYPES.PLAYER_HIT_BY_EXPLOSION:
-            //   if (currentPlayer)
-            //     currentPlayer.isPlayerHitByExplosion(data, currentRoom);
-            //   break;
-
             case SOCKET_TYPES.PLAYER_CHAT:
               if (currentRoom) {
                 currentRoom.broadcast({
@@ -80,7 +75,7 @@ export default class WebSocketService {
 
       ws.on("close", () => {
         if (currentRoom && currentPlayer) {
-          currentRoom.removePlayer(currentPlayer.nickname);
+          currentRoom.removePlayer(currentPlayer.nickname, this.gameService);
           currentRoom.broadcast({
             type: SOCKET_TYPES.PLAYER_UPDATE,
             playerCount: currentRoom.players.size,
