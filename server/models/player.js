@@ -12,7 +12,10 @@ export default class Player {
     this.size = 1;
     this.lives = 3;
     this.speed = 6;
-    this.isMoving = false;
+    this.UP = false;
+    this.DOWN = false;
+    this.RIGHT = false;
+    this.LEFT = false;
     this.isDead = false;
     this.direction = "up";
     this.movementStartTime = null;
@@ -36,7 +39,7 @@ export default class Player {
       direction: this.direction,
       fireRange: this.fireRange,
       maxBombs: this.maxBombs,
-      placedBombCount: this.placedBombCount
+      placedBombCount: this.placedBombCount,
     };
   }
 
@@ -47,38 +50,58 @@ export default class Player {
       this.isDead = true;
     }
   }
-
-  updateMove(data, room) {
+  startMove(direction) {
+    switch (direction) {
+      case "up":
+        this.UP = true;
+        break;
+      case "down":
+        this.DOWN = true;
+        break;
+      case "left":
+        this.LEFT = true;
+        break;
+      case "right":
+        this.RIGHT = true;
+        break;
+    }
+  }
+  stopMove(direction) {
+    switch (direction) {
+      case "up":
+        this.UP = false;
+        break;
+      case "down":
+        this.DOWN = false;
+        break;
+      case "left":
+        this.LEFT = false;
+        break;
+      case "right":
+        this.RIGHT = false;
+        break;
+    }
+  }
+  updateMove(deltaTime, room) {
     if (this.isDead) return;
-    const deltaTime = data.deltaTime || 0.016;
     const moveSpeed = this.speed * deltaTime;
     const prevX = this.x;
     const prevY = this.y;
 
-    switch (data.direction) {
-      case "up":
-        this.y = Math.max(0, this.y - moveSpeed);
-        this.direction = "up";
-        this.isMoving = true;
-        break;
-      case "down":
-        this.y = Math.min(room.map.length - this.size, this.y + moveSpeed);
-        this.direction = "down";
-        this.isMoving = true;
-        break;
-      case "left":
-        this.x = Math.max(0, this.x - moveSpeed);
-        this.direction = "left";
-        this.isMoving = true;
-        break;
-      case "right":
-        this.x = Math.min(room.map[0].length - this.size, this.x + moveSpeed);
-        this.direction = "right";
-        this.isMoving = true;
-        break;
-      default:
-        this.isMoving = false;
-        break;
+    if (this.UP) {
+      this.y = Math.max(0, this.y - moveSpeed);
+    }
+
+    if (this.DOWN) {
+      this.y = Math.min(room.map.length - this.size, this.y + moveSpeed);
+    }
+
+    if (this.LEFT) {
+      this.x = Math.max(0, this.x - moveSpeed);
+    }
+
+    if (this.RIGHT) {
+      this.x = Math.min(room.map[0].length - this.size, this.x + moveSpeed);
     }
 
     if (this._checkCollision(room)) {
@@ -88,19 +111,17 @@ export default class Player {
       this._checkpowerupCollection(room);
     }
 
-    if (this.isMoving) {
-      const moveData = {
-        type: SOCKET_TYPES.PLAYER_MOVE,
-        position: {
-          x: this.x,
-          y: this.y,
-        },
-        direction: this.direction,
-        nickname: this.nickname,
-      };
+    const moveData = {
+      type: SOCKET_TYPES.PLAYER_MOVE,
+      position: {
+        x: this.x,
+        y: this.y,
+      },
+      direction: this.direction,
+      nickname: this.nickname,
+    };
 
-      room.broadcast(moveData);
-    }
+    room.broadcast(moveData);
   }
 
   _checkCollision(room) {
@@ -143,23 +164,12 @@ export default class Player {
     const row = Math.floor(this.y + this.size / 2);
     const col = Math.floor(this.x + this.size / 2);
 
-    const frames = [
-      { x: -5, y: 0 },
-      { x: -40, y: 0 },
-      { x: -75, y: 0 },
-      { x: -112, y: 0 },
-      { x: -146, y: 0 },
-      { x: -75, y: 36 },
-      { x: -112, y: 36 },
-      { x: -146, y: 36 },
-    ];
-
     this.placedBombCount++;
     this._drawBomb(row, col, room);
 
     setTimeout(() => {
       this._removeBomb(row, col, room);
-      this._destroyWall(row, col, frames, room);
+      this._destroyWall(row, col, room);
     }, 3000);
   }
 
@@ -183,11 +193,10 @@ export default class Player {
     });
   }
 
-  _destroyWall(row, col, frames, room) {
+  _destroyWall(row, col, room) {
     room.broadcast({
       type: SOCKET_TYPES.EXPLOSION,
       position: { row, col },
-      frames,
     });
 
     room.broadcast({

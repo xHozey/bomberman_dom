@@ -11,6 +11,7 @@ const App = () => {
   const [socket_data, setData] = useState(null);
   const [messages, setMessages] = useState([]);
   ws.onmessage = (e) => {
+    
     const data = JSON.parse(e.data);
     console.log(data.type);
     switch (data.type) {
@@ -31,7 +32,7 @@ const App = () => {
     case "game_lobby":
       return Component(GameLobby, { data: socket_data }, "game_lobby");
     case "game_start":
-      return Component(GameStart, { data: socket_data }, "game_start");
+      return Component(GameStart, { data: socket_data, ws }, "game_start");
   }
 };
 

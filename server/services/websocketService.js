@@ -13,7 +13,7 @@ export default class WebSocketService {
   initialize() {
     this.wss.on("connection", (ws) => {
       let currentPlayer;
-      let currentRoom
+      let currentRoom;
       ws.on("message", (message) => {
         let data;
         try {
@@ -44,22 +44,25 @@ export default class WebSocketService {
             this.roomService.scheduleGameStart(currentRoom, this.gameService);
             break;
 
-          case SOCKET_TYPES.PLAYER_MOVE:
-            if (currentPlayer)
-              currentPlayer.updateMove(data, currentRoom);
+          case SOCKET_TYPES.PLAYER_START_MOVE:
+            if (currentPlayer) {
+              currentPlayer.startMove(data.direction);
+            }
             break;
-
+          case SOCKET_TYPES.PLAYER_STOP_MOVE:
+            if (currentPlayer) {
+              currentPlayer.stopMove(data.direction);
+            }
+            break;
           case SOCKET_TYPES.PLAYER_PLACE_BOMB:
             if (currentPlayer) currentPlayer.placeBomb(currentRoom);
             break;
-
           case SOCKET_TYPES.PLAYER_HIT_BY_EXPLOSION:
             if (currentPlayer)
               currentPlayer.isPlayerHitByExplosion(data, currentRoom);
             break;
 
           case SOCKET_TYPES.PLAYER_CHAT:
-            console.log(currentPlayer);
             if (currentRoom) {
               currentRoom.broadcast({
                 type: SOCKET_TYPES.PLAYER_CHAT,

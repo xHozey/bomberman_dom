@@ -1,7 +1,6 @@
 import { safeStringify } from "../utils/helpers.js";
 import { SOCKET_TYPES } from "../../client/src/utils.js";
 
-
 export default class Room {
   constructor(id) {
     this.id = id;
@@ -33,8 +32,10 @@ export default class Room {
           name: this.players.values().next().value.nickname,
         });
         this.started = false;
+        gameService.stopGame(this);
       } else if (this.players.size === 0) {
         this.started = false;
+        gameService.stopGame(this);
       }
     }
   }

@@ -1,16 +1,95 @@
-import { Create } from "../../mostJS/core/dom.js";
-import { tileSize } from "../utils.js";
+import { Div, Create, useRef } from "../../mostJS/index.js";
+import { SOCKET_TYPES, tileSize } from "../utils.js";
 
-const GameStart = ({ data }) => {
-    console.log(data)
-  return draw(data.map, data);
+const GameStart = ({ data, ws }) => {
+  ws.onmessage = (e) => {
+    const parsedData = JSON.parse(e.data);
+    let tile;
+    console.log(parsedData);
+    switch (parsedData.type) {
+      case SOCKET_TYPES.PLAYER_MOVE:
+        const player = useRef(parsedData.nickname);
+        player.style.transform = `translate(${
+          parsedData.position.x * tileSize
+        }px, ${parsedData.position.y * tileSize}px)`;
+        break;
+      case SOCKET_TYPES.PUT_BOMB:
+        tile = useRef(`${parsedData.position.row}_${parsedData.position.col}`);
+        console.log(tile);
+        tile.style.backgroundColor = "black";
+        break;
+      case SOCKET_TYPES.REMOVE_BOMB:
+        tile = useRef(`${parsedData.position.row}_${parsedData.position.col}`);
+        tile.style.backgroundColor = "beige";
+        break;
+      case SOCKET_TYPES.EXPLOSION:
+    }
+  };
+
+  window.addEventListener("keydown", (e) => {
+    let direction;
+    switch (e.key.toLowerCase()) {
+      case "a":
+        direction = "left";
+        break;
+      case "s":
+        direction = "down";
+        break;
+      case "d":
+        direction = "right";
+        break;
+      case "w":
+        direction = "up";
+        break;
+      case " ":
+        ws.send(
+          JSON.stringify({
+            type: SOCKET_TYPES.PLAYER_PLACE_BOMB,
+          })
+        );
+        return;
+    }
+
+    ws.send(
+      JSON.stringify({
+        type: SOCKET_TYPES.PLAYER_START_MOVE,
+        direction,
+      })
+    );
+  });
+
+  window.addEventListener("keyup", (e) => {
+    let direction;
+    switch (e.key.toLowerCase()) {
+      case "a":
+        direction = "left";
+        break;
+      case "s":
+        direction = "down";
+        break;
+      case "d":
+        direction = "right";
+        break;
+      case "w":
+        direction = "up";
+        break;
+    }
+
+    ws.send(
+      JSON.stringify({
+        type: SOCKET_TYPES.PLAYER_STOP_MOVE,
+        direction,
+      })
+    );
+  });
+
+  return Div({}, [draw(data.map, data)]);
 };
 
 const draw = (map, data) => {
   const rows = map.length;
   const columns = map[0].length;
 
-  // Create all tile elements
   const tileElements = [];
   const playerElements = [];
 
@@ -19,20 +98,21 @@ const draw = (map, data) => {
       const tile = map[row][column];
       let blockColor = "";
       let className = "tile";
-      let id = `tile_${row}_${column}`;
+      let ref = `${row}_${column}`;
 
       // Handle different tile types
       switch (tile) {
         case 0: // Empty path
           className = "tile path";
+          blockColor = "beige";
           break;
         case 1: // Solid wall
-          blockColor = "black";
-          id = "wallfix";
+          blockColor = "brown";
+          //   id = "wallfix";
           break;
         case 2: // Breakable wall
-          blockColor = "white";
-          id = "WallBreak";
+          blockColor = "grey";
+          //   id = "WallBreak";
           break;
         case 5:
         case 6:
@@ -47,7 +127,7 @@ const draw = (map, data) => {
         className,
         "data-row": row,
         "data-column": column,
-        id,
+        reference: ref,
         style: {
           width: `${tileSize}px`,
           height: `${tileSize}px`,
@@ -61,17 +141,13 @@ const draw = (map, data) => {
       // Handle player elements (tiles 5-8)
       if (tile >= 5 && tile <= 8) {
         const playerIndex = tile - 5;
-        const playerStyles = [
-          "yellow",
-          "blue",
-          "red",
-          "purple",
-        ];
+        const playerStyles = ["blue", "red", "green", "yellow"];
 
         const playerX = data.players[playerIndex].x * tileSize;
         const playerY = data.players[playerIndex].y * tileSize;
 
         const playerElement = Create("div", {
+          reference: data.players[playerIndex].nickname,
           className: "player",
           id: `player_${data.players[playerIndex].id}`,
           style: {
@@ -97,8 +173,8 @@ const draw = (map, data) => {
         display: "grid",
         gridTemplateRows: `repeat(${rows}, ${tileSize}px)`,
         gridTemplateColumns: `repeat(${columns}, ${tileSize}px)`,
-        alignContent: "center",
-        justifyContent: "center",
+        // alignContent: "center",
+        // justifyContent: "center",
         position: "relative",
       },
     },
