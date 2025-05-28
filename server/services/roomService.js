@@ -69,7 +69,7 @@ export default class RoomService {
   }
 
   scheduleGameStart(room, gameService) {
-    if (!this.roomTimeouts.has(`${room.id}_starting`)) {
+    if (!this.roomTimeouts.has(`start${room.id}_starting`)) {
       const timeout = setTimeout(() => {
         gameService.startGame(room);
         this.roomTimeouts.delete(`${room.id}_starting`);
