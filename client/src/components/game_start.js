@@ -123,7 +123,6 @@ const draw = (map, data) => {
       let className = "tile";
       let ref = `${row}_${column}`;
 
-      // Handle different tile types
       switch (tile) {
         case 0: // Empty path
           className = "tile path";
@@ -131,16 +130,15 @@ const draw = (map, data) => {
           break;
         case 1: // Solid wall
           blockColor = "brown";
-          //   id = "wallfix";
           break;
         case 2: // Breakable wall
           blockColor = "grey";
-          //   id = "WallBreak";
           break;
         case 5:
         case 6:
         case 7:
-        case 8: // Player spawn positions
+        case 8: 
+          blockColor = "beige"
           className = "tile spawn";
           break;
       }
