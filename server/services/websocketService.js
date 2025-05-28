@@ -18,63 +18,63 @@ export default class WebSocketService {
         let data;
         try {
           data = JSON.parse(message);
+
+          switch (data.type) {
+            case SOCKET_TYPES.PLAYER_JOIN:
+              currentRoom = this.roomService.findAvailableRoom();
+              currentPlayer = new Player(data.nickname, ws, currentRoom);
+
+              if (currentRoom.players.get(data.nickname)) {
+                return;
+              }
+              currentRoom.addPlayer(currentPlayer);
+
+              currentRoom.broadcast({
+                type: SOCKET_TYPES.PLAYER_UPDATE,
+                playerCount: currentRoom.players.size,
+              });
+
+              logger.info(
+                `Player ${data.nickname} joined Room ${currentRoom.id}`
+              );
+              this.roomService.scheduleGameStart(currentRoom, this.gameService);
+              break;
+
+            case SOCKET_TYPES.PLAYER_START_MOVE:
+              if (currentPlayer) {
+                currentPlayer.startMove(data.direction);
+              }
+              break;
+            case SOCKET_TYPES.PLAYER_STOP_MOVE:
+              if (currentPlayer) {
+                currentPlayer.stopMove(data.direction);
+              }
+              break;
+            case SOCKET_TYPES.PLAYER_PLACE_BOMB:
+              if (currentPlayer) currentPlayer.placeBomb(currentRoom);
+              break;
+            // case SOCKET_TYPES.PLAYER_HIT_BY_EXPLOSION:
+            //   if (currentPlayer)
+            //     currentPlayer.isPlayerHitByExplosion(data, currentRoom);
+            //   break;
+
+            case SOCKET_TYPES.PLAYER_CHAT:
+              if (currentRoom) {
+                currentRoom.broadcast({
+                  type: SOCKET_TYPES.PLAYER_CHAT,
+                  nickname: currentPlayer.nickname,
+                  messageText: data.messageText || "",
+                });
+              }
+              break;
+
+            default:
+              logger.warn("Unknown message type:", data.type);
+              break;
+          }
         } catch (err) {
           console.error("Invalid message:", err);
           return;
-        }
-
-        switch (data.type) {
-          case SOCKET_TYPES.PLAYER_JOIN:
-            currentRoom = this.roomService.findAvailableRoom();
-            currentPlayer = new Player(data.nickname, ws, currentRoom);
-
-            if (currentRoom.players.get(data.nickname)) {
-              return;
-            }
-            currentRoom.addPlayer(currentPlayer);
-
-            currentRoom.broadcast({
-              type: SOCKET_TYPES.PLAYER_UPDATE,
-              playerCount: currentRoom.players.size,
-            });
-
-            logger.info(
-              `Player ${data.nickname} joined Room ${currentRoom.id}`
-            );
-            this.roomService.scheduleGameStart(currentRoom, this.gameService);
-            break;
-
-          case SOCKET_TYPES.PLAYER_START_MOVE:
-            if (currentPlayer) {
-              currentPlayer.startMove(data.direction);
-            }
-            break;
-          case SOCKET_TYPES.PLAYER_STOP_MOVE:
-            if (currentPlayer) {
-              currentPlayer.stopMove(data.direction);
-            }
-            break;
-          case SOCKET_TYPES.PLAYER_PLACE_BOMB:
-            if (currentPlayer) currentPlayer.placeBomb(currentRoom);
-            break;
-          case SOCKET_TYPES.PLAYER_HIT_BY_EXPLOSION:
-            if (currentPlayer)
-              currentPlayer.isPlayerHitByExplosion(data, currentRoom);
-            break;
-
-          case SOCKET_TYPES.PLAYER_CHAT:
-            if (currentRoom) {
-              currentRoom.broadcast({
-                type: SOCKET_TYPES.PLAYER_CHAT,
-                nickname: currentPlayer.nickname,
-                messageText: data.messageText || "",
-              });
-            }
-            break;
-
-          default:
-            logger.warn("Unknown message type:", data.type);
-            break;
         }
       });
 

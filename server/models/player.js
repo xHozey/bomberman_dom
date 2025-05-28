@@ -199,12 +199,6 @@ export default class Player {
       position: { row, col },
     });
 
-    room.broadcast({
-      type: SOCKET_TYPES.PLAYER_HIT_BY_EXPLOSION,
-      row,
-      col,
-    });
-
     const baseDirections = [
       { dr: -1, dc: 0 },
       { dr: 1, dc: 0 },
@@ -229,14 +223,8 @@ export default class Player {
         room.broadcast({
           type: SOCKET_TYPES.EXPLOSION,
           position: { row: newRow, col: newCol },
-          frames,
         });
-
-        room.broadcast({
-          type: SOCKET_TYPES.PLAYER_HIT_BY_EXPLOSION,
-          row: newRow,
-          col: newCol,
-        });
+        room.map[newRow][newCol] = 99;
 
         if (room.map[newRow][newCol] === 2) {
           room.map[newRow][newCol] = 0;
@@ -248,14 +236,12 @@ export default class Player {
               position: { row: newRow, col: newCol },
               gift: true,
               index,
-              frames,
             });
           } else {
             room.broadcast({
               type: SOCKET_TYPES.WALL_DESTROY,
               position: { row: newRow, col: newCol },
               gift: false,
-              frames,
             });
           }
           break;
@@ -269,13 +255,13 @@ export default class Player {
     });
   }
 
-  isPlayerHitByExplosion(data, room) {
+  isPlayerHitByExplosion(room) {
     const playerCenterX = this.x + this.size / 2;
     const playerCenterY = this.y + this.size / 2;
     const playerTileRow = Math.floor(playerCenterY);
     const playerTileCol = Math.floor(playerCenterX);
 
-    if (data.row === playerTileRow && data.col === playerTileCol) {
+    if (room.map[playerTileRow][playerTileCol] == 99) {
       this.loseLife();
       this.conn.send(
         safeStringify({
