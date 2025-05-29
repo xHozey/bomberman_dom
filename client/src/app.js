@@ -36,8 +36,6 @@ const App = () => {
       return Component(GameLobby, { data: socket_data }, "game_lobby");
     case "game_start":
       return Component(GameStart, { data: socket_data, ws }, "game_start");
-    case "game_end":
-      return Component(GameEnd, { data: socket_data }, "game_end");
   }
 };
 
